@@ -11,4 +11,4 @@ repository = "https://github.com/VladasZ/reflected"
 [dependencies]
 rand = "0.8.5"
 
-reflected_proc = { path = "../reflected_proc" }
+reflected_proc = "0.1.1"
