@@ -1,3 +1,3 @@
 # Reflected
 
-Description should be here.
+My experiments with proc macro and with goal to create convenient reflection like mechanism.

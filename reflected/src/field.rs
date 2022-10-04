@@ -1,4 +1,3 @@
-
 #[derive(Debug, Eq, PartialEq)]
 pub enum Type {
     Float,
@@ -8,16 +7,11 @@ pub enum Type {
 
 #[derive(Debug)]
 pub struct Field {
-    pub name:   &'static str,
-    pub tp:     Type,
-    pub unique: bool,
+    pub name: &'static str,
+    pub tp: Type,
 }
 
 impl Field {
-    pub fn is_id(&self) -> bool {
-        self.name == "rowid" || self.name == "id"
-    }
-
     pub fn is_text(&self) -> bool {
         matches!(self.tp, Type::Text)
     }

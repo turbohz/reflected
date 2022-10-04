@@ -40,3 +40,12 @@ pub trait Reflected: Default {
         res
     }
 }
+
+/// Review or rename this
+pub fn to_database_string<Val: ToString + ?Sized>(val: &Val, is_text: bool) -> String {
+    if is_text {
+        format!("\'{}\'", val.to_string())
+    } else {
+        val.to_string()
+    }
+}

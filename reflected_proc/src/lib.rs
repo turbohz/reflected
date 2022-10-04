@@ -3,7 +3,6 @@ use std::str::FromStr;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    parse::Parser,
     parse_macro_input, Data, DeriveInput, Fields, FieldsNamed, Ident, Type,
     __private::{Span, TokenStream2},
 };
@@ -12,6 +11,7 @@ use crate::field::Field;
 
 mod field;
 
+/// Data must also derive `Default`
 #[proc_macro_attribute]
 pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
     let mut stream = parse_macro_input!(stream as DeriveInput);
@@ -39,17 +39,8 @@ pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
     let fields_get_value = fields_get_value(&fields);
     let fields_set_value = fields_set_value(&fields);
 
-    struct_fields.named.push(
-        syn::Field::parse_named
-            .parse2(quote! { pub id: Option<u64> })
-            .unwrap(),
-    );
-
     quote! {
         #stream
-
-        use std::borrow::Borrow;
-        use database::{to_database_string, TryIntoVal};
 
         pub struct #fields_struct_name {
             #fields_struct
@@ -57,44 +48,34 @@ pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
 
         impl #name {
             pub const FIELDS: #fields_struct_name = #fields_struct_name {
-                id: database::Field {
-                    name: "rowid",
-                    tp: reflected::Type::Integer,
-                    unique: false,
-                },
                 #fields_const_var
             };
         }
 
-        impl database::Reflected for #name {
+        impl reflected::Reflected for #name {
             fn type_name() -> &'static str {
                 #name_string
             }
 
-            fn fields() -> &'static [database::Field] {
+            fn fields() -> &'static [reflected::Field] {
                 &[
-                    database::Field {
-                        name: "rowid",
-                        tp: database::Type::Integer,
-                        unique: false,
-                    },
                     #fields_reflect
                 ]
             }
 
-            fn get_value(&self, field: impl Borrow<database::Field>) -> String {
+            fn get_value(&self, field: impl std::borrow::Borrow<reflected::Field>) -> String {
+                use std::borrow::Borrow;
                 let field = field.borrow();
                 match field.name {
                     #fields_get_value
-                    "rowid" => to_database_string(&self.id.unwrap_or_default(), false),
                     _ => unreachable!("Invalid field value in get_value: {}", field.name),
                 }
             }
 
-            fn set_value(&mut self, value: &str, field: &'static database::Field) {
+            fn set_value(&mut self, value: &str, field: &'static reflected::Field) {
+                use reflected::TryIntoVal;
                 match field.name {
                     #fields_set_value
-                    "rowid" => self.id = value.try_into_val(),
                     _ => unreachable!("Invalid field value in set_value"),
                 }
             }
@@ -117,10 +98,9 @@ fn fields_const_var(fields: &Vec<Field>) -> TokenStream2 {
 
         res = quote! {
             #res
-            #name: database::Field {
+            #name: reflected::Field {
                 name: #name_string,
-                tp: database::Type::#field_type,
-                unique: false,
+                tp: reflected::Type::#field_type,
             },
         }
     }
@@ -138,12 +118,11 @@ fn fields_struct(fields: &Vec<Field>) -> TokenStream2 {
         let name = &field.name;
         res = quote! {
             #res
-            pub #name: database::Field,
+            pub #name: reflected::Field,
         }
     }
 
     quote! {
-        pub id: database::Field,
         #res
     }
 }
@@ -178,7 +157,7 @@ fn fields_get_value(fields: &Vec<Field>) -> TokenStream2 {
 
         res = quote! {
             #res
-            #name_string => to_database_string(&self.#field_name, field.is_text()),
+            #name_string => reflected::to_database_string(&self.#field_name, field.is_text()),
         }
     }
 
@@ -221,7 +200,7 @@ fn parse_fields(fields: &FieldsNamed) -> Vec<Field> {
 
             Field {
                 name: name.clone(),
-                tp:   tp.clone(),
+                tp: tp.clone(),
             }
         })
         .collect()
