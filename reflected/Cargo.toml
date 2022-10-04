@@ -1,0 +1,14 @@
+[package]
+name = "reflected"
+version = "0.1.1"
+edition = "2021"
+authors = ["Vladas Zakrevksis <146100@gmail.com>"]
+description = "Something like reflection"
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/VladasZ/reflected"
+repository = "https://github.com/VladasZ/reflected"
+
+[dependencies]
+rand = "0.8.5"
+
+reflected_proc = { path = "../reflected_proc" }
