@@ -12,6 +12,10 @@ pub struct Field {
 }
 
 impl Field {
+    pub fn is_id(&self) -> bool {
+        self.name == "id"
+    }
+
     pub fn is_text(&self) -> bool {
         matches!(self.tp, Type::Text)
     }
