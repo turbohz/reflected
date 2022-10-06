@@ -26,6 +26,7 @@ impl Field {
         match self.tp.to_string().as_str() {
             "i32" => integer.into(),
             "u64" => integer.into(),
+            "usize" => integer.into(),
             "String" => text.into(),
             _ => None,
         }
