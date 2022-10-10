@@ -15,20 +15,21 @@ impl Field {
         TokenStream2::from_str(&format!("\"{}\"", self.name)).unwrap()
     }
 
-    pub(crate) fn db_serializable(&self) -> bool {
-        self.field_type().is_some()
+    pub(crate) fn supported(&self) -> bool {
+        self.field_type() != Ident::new("Unsupported", Span::call_site())
     }
 
-    pub(crate) fn field_type(&self) -> Option<Ident> {
+    pub(crate) fn field_type(&self) -> Ident {
         let integer = Ident::new("Integer", Span::call_site());
         let text = Ident::new("Text", Span::call_site());
+        let unsupported = Ident::new("Unsupported", Span::call_site());
 
         match self.tp.to_string().as_str() {
-            "i32" => integer.into(),
-            "u64" => integer.into(),
-            "usize" => integer.into(),
-            "String" => text.into(),
-            _ => None,
+            "i32" => integer,
+            "u64" => integer,
+            "usize" => integer,
+            "String" => text,
+            _ => unsupported,
         }
     }
 }

@@ -42,6 +42,7 @@ pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
     quote! {
         #stream
 
+        #[derive(Debug)]
         pub struct #fields_struct_name {
             #fields_struct
         }
@@ -90,9 +91,7 @@ fn fields_const_var(fields: &Vec<Field>) -> TokenStream2 {
     for field in fields {
         let name = &field.name;
 
-        let Some(field_type) = field.field_type() else {
-            continue
-        };
+        let field_type = field.field_type();
 
         let name_string = field.name_as_string();
 
@@ -112,9 +111,6 @@ fn fields_struct(fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
 
     for field in fields {
-        if !field.db_serializable() {
-            continue;
-        }
         let name = &field.name;
         res = quote! {
             #res
@@ -131,9 +127,6 @@ fn fields_reflect(name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
 
     for field in fields {
-        if !field.db_serializable() {
-            continue;
-        }
         let field_name = &field.name;
         res = quote! {
             #res
@@ -148,7 +141,7 @@ fn fields_get_value(fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
 
     for field in fields {
-        if !field.db_serializable() {
+        if !field.supported() {
             continue;
         }
 
@@ -168,7 +161,7 @@ fn fields_set_value(fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
 
     for field in fields {
-        if !field.db_serializable() {
+        if !field.supported() {
             continue;
         }
 

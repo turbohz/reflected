@@ -1,9 +1,4 @@
-#[derive(Debug, Eq, PartialEq)]
-pub enum Type {
-    Float,
-    Integer,
-    Text,
-}
+use crate::Type;
 
 #[derive(Debug)]
 pub struct Field {
@@ -14,6 +9,10 @@ pub struct Field {
 impl Field {
     pub fn is_id(&self) -> bool {
         self.name == "id"
+    }
+
+    pub fn is_unsupported(&self) -> bool {
+        matches!(self.tp, Type::Unsupported)
     }
 
     pub fn is_text(&self) -> bool {
