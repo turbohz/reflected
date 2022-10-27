@@ -29,13 +29,14 @@ pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
     let fields = parse_fields(struct_fields);
 
     let name = &stream.ident;
-    let name_string = TokenStream2::from_str(&format!("\"{}\"", name)).unwrap();
+    let name_string = TokenStream2::from_str(&format!("\"{name}\"")).unwrap();
 
-    let fields_struct_name = Ident::new(&format!("{}Fields", name), Span::call_site());
+    let fields_struct_name = Ident::new(&format!("{name}Fields"), Span::call_site());
 
     let fields_struct = fields_struct(&fields);
-    let fields_const_var = fields_const_var(&fields);
+    let fields_const_var = fields_const_var(name, &fields);
     let fields_reflect = fields_reflect(name, &fields);
+    let subfields = subfields(&fields);
     let fields_get_value = fields_get_value(&fields);
     let fields_set_value = fields_set_value(&fields);
 
@@ -64,20 +65,36 @@ pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
                 ]
             }
 
-            fn get_value(&self, field: impl std::borrow::Borrow<reflected::Field>) -> String {
+            fn subfields(field: impl std::borrow::Borrow<reflected::Field>) -> &'static [reflected::Field] {
                 use std::borrow::Borrow;
                 let field = field.borrow();
                 match field.name {
-                    #fields_get_value
-                    _ => unreachable!("Invalid field value in get_value: {}", field.name),
+                    #subfields
+                    _ => unreachable!("Invalid field name in subfields: {}", field.name),
                 }
             }
 
-            fn set_value(&mut self, value: &str, field: &'static reflected::Field) {
+            fn get_value(&self, field: impl std::borrow::Borrow<reflected::Field>) -> String {
+                use std::borrow::Borrow;
+                let field = field.borrow();
+
+                if field.is_custom() {
+                    return "speder".into()
+                }
+
+                match field.name {
+                    #fields_get_value
+                    _ => unreachable!("Invalid field name in get_value: {}", field.name),
+                }
+            }
+
+            fn set_value(&mut self, value: &str, field: impl std::borrow::Borrow<reflected::Field>) {
                 use reflected::TryIntoVal;
+                use std::borrow::Borrow;
+                let field = field.borrow();
                 match field.name {
                     #fields_set_value
-                    _ => unreachable!("Invalid field value in set_value"),
+                    _ => unreachable!("Invalid field name in set_value"),
                 }
             }
         }
@@ -85,8 +102,10 @@ pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
     .into()
 }
 
-fn fields_const_var(fields: &Vec<Field>) -> TokenStream2 {
+fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
+
+    let type_name = TokenStream2::from_str(&format!("\"{type_name}\"")).unwrap();
 
     for field in fields {
         let name = &field.name;
@@ -94,12 +113,15 @@ fn fields_const_var(fields: &Vec<Field>) -> TokenStream2 {
         let field_type = field.field_type();
 
         let name_string = field.name_as_string();
+        let type_string = field.type_as_string();
 
         res = quote! {
             #res
             #name: reflected::Field {
                 name: #name_string,
                 tp: reflected::Type::#field_type,
+                type_string: #type_string,
+                parent_name: #type_name,
             },
         }
     }
@@ -137,11 +159,30 @@ fn fields_reflect(name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
     res
 }
 
+fn subfields(fields: &Vec<Field>) -> TokenStream2 {
+    let mut res = quote!();
+
+    for field in fields {
+        if !field.custom() {
+            continue;
+        }
+
+        let name_string = field.name_as_string();
+        let field_type = &field.tp;
+        res = quote! {
+            #res
+            #name_string => #field_type::fields(),
+        }
+    }
+
+    res
+}
+
 fn fields_get_value(fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
 
     for field in fields {
-        if !field.supported() {
+        if field.custom() {
             continue;
         }
 
@@ -161,7 +202,7 @@ fn fields_set_value(fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
 
     for field in fields {
-        if !field.supported() {
+        if field.custom() {
             continue;
         }
 

@@ -15,21 +15,25 @@ impl Field {
         TokenStream2::from_str(&format!("\"{}\"", self.name)).unwrap()
     }
 
-    pub(crate) fn supported(&self) -> bool {
-        self.field_type() != Ident::new("Unsupported", Span::call_site())
+    pub(crate) fn type_as_string(&self) -> TokenStream2 {
+        TokenStream2::from_str(&format!("\"{}\"", self.tp)).unwrap()
+    }
+
+    pub(crate) fn custom(&self) -> bool {
+        self.field_type() == Ident::new("Custom", Span::call_site())
     }
 
     pub(crate) fn field_type(&self) -> Ident {
+        let float = Ident::new("Float", Span::call_site());
         let integer = Ident::new("Integer", Span::call_site());
         let text = Ident::new("Text", Span::call_site());
-        let unsupported = Ident::new("Unsupported", Span::call_site());
+        let custom = Ident::new("Custom", Span::call_site());
 
         match self.tp.to_string().as_str() {
-            "i32" => integer,
-            "u64" => integer,
-            "usize" => integer,
+            "f32" | "f64" => float,
+            "i32" | "u32" | "i64" | "u64" | "isize" | "usize" => integer,
             "String" => text,
-            _ => unsupported,
+            _ => custom,
         }
     }
 }

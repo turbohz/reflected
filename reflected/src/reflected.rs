@@ -9,9 +9,12 @@ use crate::Field;
 
 pub trait Reflected: Default {
     fn type_name() -> &'static str;
+
     fn fields() -> &'static [Field];
+    fn subfields(field: impl Borrow<Field>) -> &'static [Field];
+
     fn get_value(&self, field: impl Borrow<Field>) -> String;
-    fn set_value(&mut self, value: &str, field: &'static Field);
+    fn set_value(&mut self, value: &str, field: impl Borrow<Field>);
 
     fn field_by_name(name: &str) -> &'static Field {
         Self::fields().iter().find(|a| a.name == name).unwrap()

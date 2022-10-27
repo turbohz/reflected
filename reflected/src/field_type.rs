@@ -3,5 +3,5 @@ pub enum Type {
     Float,
     Integer,
     Text,
-    Unsupported,
+    Custom,
 }

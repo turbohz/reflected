@@ -2,27 +2,24 @@ use reflected::Reflected;
 use reflected_proc::reflected;
 
 #[reflected]
-#[derive(Debug, Default)]
+#[derive(Default, Debug)]
 struct Data {
-    string: String,
-    int: i32,
-}
+    _f32: f32,
+    _f64: f64,
 
-#[reflected]
-#[derive(Debug, Default)]
-struct HasData {
-    top_stre: String,
-    top_int: i32,
-    data: Data,
+    _i32: i32,
+    _u32: u32,
+    _i64: i64,
+    _u64: u64,
+
+    _isize: isize,
+    _usize: usize,
+
+    _string: String,
 }
 
 fn main() {
-    dbg!(Data::default());
-    dbg!(Data::random());
-    dbg!(Data::fields());
     dbg!(Data::FIELDS);
 
-    dbg!(HasData::FIELDS);
-
-    println!("Hello, world!");
+    assert_eq!(dbg!(Data::fields().len()), 9);
 }

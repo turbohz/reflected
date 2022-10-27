@@ -4,6 +4,8 @@ use crate::Type;
 pub struct Field {
     pub name: &'static str,
     pub tp: Type,
+    pub type_string: &'static str,
+    pub parent_name: &'static str,
 }
 
 impl Field {
@@ -11,8 +13,8 @@ impl Field {
         self.name == "id"
     }
 
-    pub fn is_unsupported(&self) -> bool {
-        matches!(self.tp, Type::Unsupported)
+    pub fn is_custom(&self) -> bool {
+        matches!(self.tp, Type::Custom)
     }
 
     pub fn is_text(&self) -> bool {
