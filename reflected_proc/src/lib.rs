@@ -88,7 +88,7 @@ pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn set_value(&mut self, value: &str, field: impl std::borrow::Borrow<reflected::Field>) {
+            fn set_value(&mut self, field: impl std::borrow::Borrow<reflected::Field>, value: &str) {
                 use reflected::TryIntoVal;
                 use std::borrow::Borrow;
                 let field = field.borrow();
@@ -191,7 +191,7 @@ fn fields_get_value(fields: &Vec<Field>) -> TokenStream2 {
 
         res = quote! {
             #res
-            #name_string => reflected::to_database_string(&self.#field_name, field.is_text()),
+            #name_string => self.#field_name.to_string(),
         }
     }
 
