@@ -2,7 +2,6 @@
 
 members = [
     "tests",
-    "example",
     "reflected",
     "reflected_proc",
 ]

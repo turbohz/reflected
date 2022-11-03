@@ -6,6 +6,7 @@ pub struct Field {
     pub tp: Type,
     pub type_string: &'static str,
     pub parent_name: &'static str,
+    pub unique: bool,
 }
 
 impl Field {

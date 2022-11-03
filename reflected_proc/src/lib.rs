@@ -12,8 +12,8 @@ use crate::field::Field;
 mod field;
 
 /// Data must also derive `Default`
-#[proc_macro_attribute]
-pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
+#[proc_macro_derive(Reflected, attributes(unique))]
+pub fn reflected(stream: TokenStream) -> TokenStream {
     let mut stream = parse_macro_input!(stream as DeriveInput);
 
     let data = match &mut stream.data {
@@ -41,8 +41,6 @@ pub fn reflected(_args: TokenStream, stream: TokenStream) -> TokenStream {
     let fields_set_value = fields_set_value(&fields);
 
     quote! {
-        #stream
-
         #[derive(Debug)]
         pub struct #fields_struct_name {
             #fields_struct
@@ -115,6 +113,8 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
         let name_string = field.name_as_string();
         let type_string = field.type_as_string();
 
+        let unique = field.unique;
+
         res = quote! {
             #res
             #name: reflected::Field {
@@ -122,6 +122,7 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
                 tp: reflected::Type::#field_type,
                 type_string: #type_string,
                 parent_name: #type_name,
+                unique: #unique
             },
         }
     }
@@ -232,9 +233,13 @@ fn parse_fields(fields: &FieldsNamed) -> Vec<Field> {
 
             let tp = &path.path.segments.first().unwrap().ident;
 
+            // Good enough for now
+            let unique = !field.attrs.is_empty();
+
             Field {
                 name: name.clone(),
                 tp: tp.clone(),
+                unique,
             }
         })
         .collect()

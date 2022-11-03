@@ -1,17 +1,18 @@
 #[cfg(test)]
 mod test {
     use reflected::Reflected;
-    use reflected_proc::reflected;
+    use reflected_proc::Reflected;
 
-    #[reflected]
-    #[derive(Default, PartialEq, Debug)]
+    #[derive(Reflected, Default, PartialEq, Debug)]
     struct User {
+        #[unique]
         name: String,
         age: usize,
     }
 
     #[test]
     fn fields() {
+        assert!(User::FIELDS.name.unique);
         assert_eq!(User::fields().len(), 2);
     }
 

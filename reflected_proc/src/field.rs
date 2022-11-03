@@ -8,6 +8,7 @@ use crate::TokenStream2;
 pub(crate) struct Field {
     pub(crate) name: Ident,
     pub(crate) tp: Ident,
+    pub(crate) unique: bool,
 }
 
 impl Field {
