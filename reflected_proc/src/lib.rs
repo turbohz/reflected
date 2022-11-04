@@ -36,7 +36,6 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
     let fields_struct = fields_struct(&fields);
     let fields_const_var = fields_const_var(name, &fields);
     let fields_reflect = fields_reflect(name, &fields);
-    let subfields = subfields(&fields);
     let fields_get_value = fields_get_value(&fields);
     let fields_set_value = fields_set_value(&fields);
 
@@ -61,15 +60,6 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 &[
                     #fields_reflect
                 ]
-            }
-
-            fn subfields(field: impl std::borrow::Borrow<reflected::Field>) -> &'static [reflected::Field] {
-                use std::borrow::Borrow;
-                let field = field.borrow();
-                match field.name {
-                    #subfields
-                    _ => unreachable!("Invalid field name in subfields: {}", field.name),
-                }
             }
 
             fn get_value(&self, field: impl std::borrow::Borrow<reflected::Field>) -> String {
@@ -154,25 +144,6 @@ fn fields_reflect(name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
         res = quote! {
             #res
             #name::FIELDS.#field_name,
-        }
-    }
-
-    res
-}
-
-fn subfields(fields: &Vec<Field>) -> TokenStream2 {
-    let mut res = quote!();
-
-    for field in fields {
-        if !field.custom() {
-            continue;
-        }
-
-        let name_string = field.name_as_string();
-        let field_type = &field.tp;
-        res = quote! {
-            #res
-            #name_string => #field_type::fields(),
         }
     }
 

@@ -13,7 +13,6 @@ pub trait Reflected: Default {
     fn type_name() -> &'static str;
 
     fn fields() -> &'static [Field];
-    fn subfields(field: impl Borrow<Field>) -> &'static [Field];
 
     fn get_value(&self, field: impl Borrow<Field>) -> String;
     fn set_value(&mut self, field: impl Borrow<Field>, value: &str);
