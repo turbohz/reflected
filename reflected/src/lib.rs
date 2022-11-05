@@ -6,10 +6,13 @@ pub use field::*;
 pub use field_type::*;
 use rand::distributions::{Alphanumeric, DistString};
 use rand::{thread_rng, Rng};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+use serde_json::{from_str, to_string};
 use std::borrow::Borrow;
 pub use try_into_val::*;
 
-pub trait Reflected: Default {
+pub trait Reflected: Default + Serialize + DeserializeOwned {
     fn type_name() -> &'static str;
 
     fn fields() -> &'static [Field];
@@ -42,5 +45,13 @@ pub trait Reflected: Default {
         }
 
         res
+    }
+
+    fn to_json(&self) -> String {
+        to_string(self).unwrap()
+    }
+
+    fn from_json(str: impl ToString) -> Option<Self> {
+        from_str(&str.to_string()).ok()
     }
 }

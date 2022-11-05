@@ -2,8 +2,10 @@
 mod test {
     use reflected::Reflected;
     use reflected_proc::Reflected;
+    use serde::Deserialize;
+    use serde::Serialize;
 
-    #[derive(Reflected, Default, PartialEq, Debug)]
+    #[derive(Reflected, Default, Serialize, Deserialize, PartialEq, Debug)]
     struct User {
         #[unique]
         name: String,
@@ -46,5 +48,17 @@ mod test {
                 age: 19
             }
         );
+    }
+
+    #[test]
+    fn json() {
+        for _ in 0..50 {
+            let obj = User::random();
+
+            let json = obj.to_json();
+            let obj2 = User::from_json(json).unwrap();
+
+            assert_eq!(obj, obj2);
+        }
     }
 }
