@@ -6,12 +6,10 @@ pub use field::*;
 pub use field_type::*;
 use rand::distributions::{Alphanumeric, DistString};
 use rand::{thread_rng, Rng};
-use serde::de::DeserializeOwned;
-use serde::Serialize;
 use std::borrow::Borrow;
 pub use try_into_val::*;
 
-pub trait Reflected: Default + Serialize + DeserializeOwned {
+pub trait Reflected: Default {
     fn type_name() -> &'static str;
 
     fn fields() -> &'static [Field];

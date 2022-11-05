@@ -2,10 +2,8 @@
 mod test {
     use reflected::Reflected;
     use reflected_proc::Reflected;
-    use serde::Deserialize;
-    use serde::Serialize;
 
-    #[derive(Reflected, Default, Serialize, Deserialize, PartialEq, Debug)]
+    #[derive(Reflected, Default, PartialEq, Debug)]
     struct User {
         #[unique]
         name: String,
