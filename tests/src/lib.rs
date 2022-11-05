@@ -49,16 +49,4 @@ mod test {
             }
         );
     }
-
-    #[test]
-    fn json() {
-        for _ in 0..50 {
-            let obj = User::random();
-
-            let json = obj.to_json();
-            let obj2 = User::from_json(json).unwrap();
-
-            assert_eq!(obj, obj2);
-        }
-    }
 }

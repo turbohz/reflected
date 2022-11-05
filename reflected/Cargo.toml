@@ -1,6 +1,6 @@
 [package]
 name = "reflected"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 authors = ["Vladas Zakrevksis <146100@gmail.com>"]
 description = "Something like reflection"
@@ -11,4 +11,3 @@ repository = "https://github.com/VladasZ/reflected"
 [dependencies]
 rand = "0.8.5"
 serde = "1.0"
-serde_json = "1.0"
