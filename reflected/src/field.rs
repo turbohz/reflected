@@ -7,6 +7,7 @@ pub struct Field {
     pub type_string: &'static str,
     pub parent_name: &'static str,
     pub unique: bool,
+    pub secure: bool,
 }
 
 impl Field {
