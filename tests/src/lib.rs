@@ -6,10 +6,10 @@ mod test {
     #[derive(Reflected, Default, PartialEq, Debug)]
     struct User {
         #[unique]
-        name: String,
+        name:     String,
         #[secure]
         password: String,
-        age: usize,
+        age:      usize,
     }
 
     #[test]
@@ -22,9 +22,9 @@ mod test {
     #[test]
     fn get() {
         let user = User {
-            name: "peter".into(),
+            name:     "peter".into(),
             password: "sokol".into(),
-            age: 15,
+            age:      15,
         };
 
         assert_eq!(user.get_value(&User::FIELDS.name), "peter".to_string());
@@ -35,9 +35,9 @@ mod test {
     #[test]
     fn set() {
         let mut user = User {
-            name: "peter".into(),
+            name:     "peter".into(),
             password: "sokol".into(),
-            age: 15,
+            age:      15,
         };
 
         user.set_value(&User::FIELDS.name, "parker");
@@ -50,9 +50,9 @@ mod test {
         assert_eq!(
             user,
             User {
-                name: "parker".into(),
+                name:     "parker".into(),
                 password: "soika".into(),
-                age: 19
+                age:      19,
             }
         );
     }

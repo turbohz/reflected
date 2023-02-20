@@ -6,8 +6,8 @@ use crate::TokenStream2;
 
 #[derive(Debug)]
 pub(crate) struct Field {
-    pub(crate) name: Ident,
-    pub(crate) tp: Ident,
+    pub(crate) name:   Ident,
+    pub(crate) tp:     Ident,
     pub(crate) unique: bool,
     pub(crate) secure: bool,
 }

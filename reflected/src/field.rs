@@ -2,12 +2,12 @@ use crate::Type;
 
 #[derive(Debug)]
 pub struct Field {
-    pub name: &'static str,
-    pub tp: Type,
+    pub name:        &'static str,
+    pub tp:          Type,
     pub type_string: &'static str,
     pub parent_name: &'static str,
-    pub unique: bool,
-    pub secure: bool,
+    pub unique:      bool,
+    pub secure:      bool,
 }
 
 impl Field {

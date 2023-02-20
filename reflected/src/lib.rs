@@ -2,11 +2,14 @@ pub mod field;
 pub mod field_type;
 pub mod try_into_val;
 
+use std::borrow::Borrow;
+
 pub use field::*;
 pub use field_type::*;
-use rand::distributions::{Alphanumeric, DistString};
-use rand::{thread_rng, Rng};
-use std::borrow::Borrow;
+use rand::{
+    distributions::{Alphanumeric, DistString},
+    thread_rng, Rng,
+};
 pub use try_into_val::*;
 
 pub trait Reflected: Default {
