@@ -1,9 +1,5 @@
 [workspace]
 
-members = [
-    "tests",
-    "reflected",
-    "reflected_proc",
-]
+members = ["tests", "reflected", "reflected_proc"]
 
 default-members = ["reflected"]

@@ -21,8 +21,16 @@ impl Field {
         TokenStream2::from_str(&format!("\"{}\"", self.tp)).unwrap()
     }
 
+    pub(crate) fn id(&self) -> bool {
+        self.name == Ident::new("id", Span::call_site())
+    }
+
     pub(crate) fn custom(&self) -> bool {
         self.field_type() == Ident::new("Custom", Span::call_site())
+    }
+
+    pub(crate) fn is_simple(&self) -> bool {
+        !self.id() && !self.custom()
     }
 
     pub(crate) fn field_type(&self) -> Ident {

@@ -36,6 +36,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
     let fields_struct = fields_struct(&fields);
     let fields_const_var = fields_const_var(name, &fields);
     let fields_reflect = fields_reflect(name, &fields);
+    let simple_fields_reflect = simple_fields_reflect(name, &fields);
     let fields_get_value = fields_get_value(&fields);
     let fields_set_value = fields_set_value(&fields);
 
@@ -59,6 +60,12 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
             fn fields() -> &'static [reflected::Field] {
                 &[
                     #fields_reflect
+                ]
+            }
+
+            fn simple_fields() -> &'static [reflected::Field] {
+                &[
+                    #simple_fields_reflect
                 ]
             }
 
@@ -142,6 +149,23 @@ fn fields_reflect(name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
 
     for field in fields {
+        let field_name = &field.name;
+        res = quote! {
+            #res
+            #name::FIELDS.#field_name,
+        }
+    }
+
+    res
+}
+
+fn simple_fields_reflect(name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
+    let mut res = quote!();
+
+    for field in fields {
+        if !field.is_simple() {
+            continue;
+        }
         let field_name = &field.name;
         res = quote! {
             #res

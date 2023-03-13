@@ -19,6 +19,10 @@ impl Field {
         matches!(self.tp, Type::Custom)
     }
 
+    pub fn is_simple(&self) -> bool {
+        !self.is_id() && !self.is_custom()
+    }
+
     pub fn is_text(&self) -> bool {
         matches!(self.tp, Type::Text)
     }
