@@ -22,7 +22,7 @@ impl Field {
     }
 
     pub(crate) fn id(&self) -> bool {
-        self.name == Ident::new("id", Span::call_site())
+        self.name.to_string().contains("_id") || self.name == Ident::new("id", Span::call_site())
     }
 
     pub(crate) fn custom(&self) -> bool {

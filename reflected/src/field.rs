@@ -12,7 +12,7 @@ pub struct Field {
 
 impl Field {
     pub fn is_id(&self) -> bool {
-        self.name == "id"
+        self.name == "id" || self.name.contains("_id")
     }
 
     pub fn is_custom(&self) -> bool {

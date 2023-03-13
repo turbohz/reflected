@@ -5,13 +5,14 @@ mod test {
 
     #[derive(Reflected, Default, PartialEq, Debug)]
     struct User {
-        id:       usize,
+        id:        usize,
         #[unique]
-        name:     String,
+        name:      String,
         #[secure]
-        password: String,
-        age:      usize,
-        custom:   CustomField,
+        password:  String,
+        age:       usize,
+        custom:    CustomField,
+        custom_id: usize,
     }
 
     #[derive(Default, PartialEq, Debug)]
@@ -23,19 +24,20 @@ mod test {
         assert!(User::FIELDS.name.unique);
         assert!(User::FIELDS.password.secure);
         assert!(User::FIELDS.custom.is_custom());
-        assert_eq!(User::fields().len(), 5);
+        assert!(User::FIELDS.custom_id.is_id());
+        assert_eq!(User::fields().len(), 6);
         assert_eq!(User::simple_fields().len(), 3);
-        dbg!(User::simple_fields());
     }
 
     #[test]
     fn get() {
         let user = User {
-            id:       0,
-            name:     "peter".into(),
-            password: "sokol".into(),
-            age:      15,
-            custom:   CustomField,
+            id:        0,
+            name:      "peter".into(),
+            password:  "sokol".into(),
+            age:       15,
+            custom:    CustomField,
+            custom_id: 0,
         };
 
         assert_eq!(user.get_value(&User::FIELDS.name), "peter".to_string());
@@ -46,11 +48,12 @@ mod test {
     #[test]
     fn set() {
         let mut user = User {
-            id:       0,
-            name:     "peter".into(),
-            password: "sokol".into(),
-            age:      15,
-            custom:   CustomField,
+            id:        0,
+            name:      "peter".into(),
+            password:  "sokol".into(),
+            age:       15,
+            custom:    CustomField,
+            custom_id: 0,
         };
 
         user.set_value(&User::FIELDS.name, "parker");
@@ -63,11 +66,12 @@ mod test {
         assert_eq!(
             user,
             User {
-                id:       0,
-                name:     "parker".into(),
-                password: "soika".into(),
-                age:      19,
-                custom:   CustomField,
+                id:        0,
+                name:      "parker".into(),
+                password:  "soika".into(),
+                age:       19,
+                custom:    CustomField,
+                custom_id: 0,
             }
         );
     }
