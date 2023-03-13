@@ -22,7 +22,11 @@ impl Field {
     }
 
     pub(crate) fn id(&self) -> bool {
-        self.name.to_string().contains("_id") || self.name == Ident::new("id", Span::call_site())
+        self.name == Ident::new("id", Span::call_site())
+    }
+
+    pub(crate) fn is_foreign_id(&self) -> bool {
+        self.name.to_string().contains("_id")
     }
 
     pub(crate) fn custom(&self) -> bool {
@@ -30,7 +34,7 @@ impl Field {
     }
 
     pub(crate) fn is_simple(&self) -> bool {
-        !self.id() && !self.custom()
+        !self.id() && !self.custom() && !self.is_foreign_id()
     }
 
     pub(crate) fn field_type(&self) -> Ident {

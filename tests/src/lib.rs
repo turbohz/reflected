@@ -24,7 +24,7 @@ mod test {
         assert!(User::FIELDS.name.unique);
         assert!(User::FIELDS.password.secure);
         assert!(User::FIELDS.custom.is_custom());
-        assert!(User::FIELDS.custom_id.is_id());
+        assert!(User::FIELDS.custom_id.is_foreign_id());
         assert_eq!(User::fields().len(), 6);
         assert_eq!(User::simple_fields().len(), 3);
     }
