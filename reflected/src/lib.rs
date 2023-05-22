@@ -4,6 +4,7 @@ pub mod try_into_val;
 
 use std::borrow::Borrow;
 
+use chrono::Utc;
 pub use field::*;
 pub use field_type::*;
 use rand::{
@@ -42,6 +43,8 @@ pub trait Reflected: Default {
                 let val: u32 = rng.gen_range(0..100);
                 let val = val.to_string();
                 res.set_value(field, &val);
+            } else if field.is_date() {
+                res.set_value(field, &Utc::now().to_string());
             };
         }
 
