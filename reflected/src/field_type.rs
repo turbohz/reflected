@@ -3,5 +3,6 @@ pub enum Type {
     Float,
     Integer,
     Text,
+    Date,
     Custom,
 }

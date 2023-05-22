@@ -27,6 +27,10 @@ impl Field {
         !self.is_id() && !self.is_custom() && !self.is_foreign_id()
     }
 
+    pub fn is_date(&self) -> bool {
+        matches!(self.tp, Type::Date)
+    }
+
     pub fn is_text(&self) -> bool {
         matches!(self.tp, Type::Text)
     }

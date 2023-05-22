@@ -74,7 +74,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 let field = field.borrow();
 
                 if field.is_custom() {
-                    return "speder".into()
+                    panic!("get_value method is not supported for custom types: {field:?}");
                 }
 
                 match field.name {

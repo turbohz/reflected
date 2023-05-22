@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod test {
+    use chrono::{DateTime, Utc};
     use reflected::Reflected;
     use reflected_proc::Reflected;
 
@@ -10,6 +11,7 @@ mod test {
         name:      String,
         #[secure]
         password:  String,
+        birthday:  DateTime<Utc>,
         age:       usize,
         custom:    CustomField,
         custom_id: usize,
@@ -25,8 +27,9 @@ mod test {
         assert!(User::FIELDS.password.secure);
         assert!(User::FIELDS.custom.is_custom());
         assert!(User::FIELDS.custom_id.is_foreign_id());
-        assert_eq!(User::fields().len(), 6);
-        assert_eq!(User::simple_fields().len(), 3);
+        assert!(User::FIELDS.birthday.is_date());
+        assert_eq!(User::fields().len(), 7);
+        assert_eq!(User::simple_fields().len(), 4);
     }
 
     #[test]
@@ -35,6 +38,7 @@ mod test {
             id:        0,
             name:      "peter".into(),
             password:  "sokol".into(),
+            birthday:  Default::default(),
             age:       15,
             custom:    CustomField,
             custom_id: 0,
@@ -51,6 +55,7 @@ mod test {
             id:        0,
             name:      "peter".into(),
             password:  "sokol".into(),
+            birthday:  Default::default(),
             age:       15,
             custom:    CustomField,
             custom_id: 0,
@@ -69,10 +74,37 @@ mod test {
                 id:        0,
                 name:      "parker".into(),
                 password:  "soika".into(),
+                birthday:  Default::default(),
                 age:       19,
                 custom:    CustomField,
                 custom_id: 0,
             }
         );
+    }
+
+    #[test]
+    fn date() {
+        let birthday = Utc::now();
+
+        let bd_string = birthday.to_string();
+
+        let mut user = User {
+            id: 0,
+            name: "peter".into(),
+            password: "sokol".into(),
+            birthday,
+            age: 15,
+            custom: CustomField,
+            custom_id: 0,
+        };
+
+        assert_eq!(bd_string, user.get_value(User::FIELDS.birthday));
+
+        let new_bd = Utc::now();
+        let new_bd_string = new_bd.to_string();
+
+        user.set_value(User::FIELDS.birthday, &new_bd_string);
+
+        assert_eq!(new_bd, user.birthday);
     }
 }
