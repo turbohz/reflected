@@ -4,5 +4,6 @@ pub enum Type {
     Integer,
     Text,
     Date,
+    Decimal,
     Custom,
 }

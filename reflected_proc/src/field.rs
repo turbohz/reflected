@@ -43,12 +43,14 @@ impl Field {
         let text = Ident::new("Text", Span::call_site());
         let custom = Ident::new("Custom", Span::call_site());
         let date = Ident::new("Date", Span::call_site());
+        let decimal = Ident::new("Decimal", Span::call_site());
 
         match self.tp.to_string().as_str() {
             "f32" | "f64" => float,
             "i32" | "u32" | "i64" | "u64" | "isize" | "usize" => integer,
             "String" => text,
             "DateTime" => date,
+            "Decimal" => decimal,
             _ => custom,
         }
     }

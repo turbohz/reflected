@@ -1,6 +1,6 @@
 [package]
 name = "reflected"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2021"
 authors = ["Vladas Zakrevksis <146100@gmail.com>"]
 description = "Something like reflection"
@@ -11,3 +11,4 @@ repository = "https://github.com/VladasZ/reflected"
 [dependencies]
 chrono = { workspace = true }
 rand = { workspace = true }
+rust_decimal = { workspace = true }

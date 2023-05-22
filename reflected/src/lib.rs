@@ -9,8 +9,9 @@ pub use field::*;
 pub use field_type::*;
 use rand::{
     distributions::{Alphanumeric, DistString},
-    thread_rng, Rng,
+    random, thread_rng, Rng,
 };
+use rust_decimal::Decimal;
 pub use try_into_val::*;
 
 pub trait Reflected: Default {
@@ -45,6 +46,9 @@ pub trait Reflected: Default {
                 res.set_value(field, &val);
             } else if field.is_date() {
                 res.set_value(field, &Utc::now().to_string());
+            } else if field.is_decimal() {
+                let dec = Decimal::new(random(), rng.gen_range(0..28));
+                res.set_value(field, &dec.to_string());
             };
         }
 
