@@ -1,6 +1,6 @@
 use crate::Type;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Field {
     pub name:        &'static str,
     pub tp:          Type,
@@ -41,5 +41,27 @@ impl Field {
 
     pub fn is_decimal(&self) -> bool {
         matches!(self.tp, Type::Decimal)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::collections::HashMap;
+
+    use crate::{Field, Type};
+
+    #[test]
+    fn store_in_map() {
+        let field: &'static Field = &Field {
+            name:        "",
+            tp:          Type::Float,
+            type_string: "",
+            parent_name: "",
+            unique:      false,
+            secure:      false,
+        };
+
+        let mut map = HashMap::<&'static Field, String>::default();
+        map.insert(field, Default::default());
     }
 }
