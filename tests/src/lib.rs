@@ -52,11 +52,11 @@ mod test {
             cash: Decimal::from_str("100.25").unwrap(),
         };
 
-        assert_eq!(user.get_value(&User::FIELDS.name), "peter".to_string());
-        assert_eq!(user.get_value(&User::FIELDS.password), "sokol".to_string());
-        assert_eq!(user.get_value(&User::FIELDS.age), "15".to_string());
-        assert_eq!(user.get_value(&User::FIELDS.birthday), birthday.to_string());
-        assert_eq!(user.get_value(&User::FIELDS.cash), "100.25".to_string());
+        assert_eq!(user.get_value(User::FIELDS.name), "peter".to_string());
+        assert_eq!(user.get_value(User::FIELDS.password), "sokol".to_string());
+        assert_eq!(user.get_value(User::FIELDS.age), "15".to_string());
+        assert_eq!(user.get_value(User::FIELDS.birthday), birthday.to_string());
+        assert_eq!(user.get_value(User::FIELDS.cash), "100.25".to_string());
     }
 
     #[test]
@@ -74,17 +74,17 @@ mod test {
 
         let new_bd = Utc::now();
 
-        user.set_value(&User::FIELDS.name, "parker");
-        user.set_value(&User::FIELDS.password, "soika");
-        user.set_value(&User::FIELDS.age, "19");
-        user.set_value(&User::FIELDS.birthday, &new_bd.to_string());
-        user.set_value(&User::FIELDS.cash, "100.71");
+        user.set_value(User::FIELDS.name, "parker");
+        user.set_value(User::FIELDS.password, "soika");
+        user.set_value(User::FIELDS.age, "19");
+        user.set_value(User::FIELDS.birthday, &new_bd.to_string());
+        user.set_value(User::FIELDS.cash, "100.71");
 
-        assert_eq!(user.get_value(&User::FIELDS.name), "parker".to_string());
-        assert_eq!(user.get_value(&User::FIELDS.password), "soika".to_string());
-        assert_eq!(user.get_value(&User::FIELDS.age), "19".to_string());
-        assert_eq!(user.get_value(&User::FIELDS.birthday), new_bd.to_string());
-        assert_eq!(user.get_value(&User::FIELDS.cash), "100.71".to_string());
+        assert_eq!(user.get_value(User::FIELDS.name), "parker".to_string());
+        assert_eq!(user.get_value(User::FIELDS.password), "soika".to_string());
+        assert_eq!(user.get_value(User::FIELDS.age), "19".to_string());
+        assert_eq!(user.get_value(User::FIELDS.birthday), new_bd.to_string());
+        assert_eq!(user.get_value(User::FIELDS.cash), "100.71".to_string());
         assert_eq!(
             user,
             User {

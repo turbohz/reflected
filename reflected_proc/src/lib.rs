@@ -63,19 +63,19 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 #name_string
             }
 
-            fn fields() -> &'static [reflected::Field] {
+            fn fields() -> &'static [&'static reflected::Field] {
                 &[
                     #fields_reflect
                 ]
             }
 
-            fn simple_fields() -> &'static [reflected::Field] {
+            fn simple_fields() -> &'static [&'static reflected::Field] {
                 &[
                     #simple_fields_reflect
                 ]
             }
 
-            fn get_value(&self, field: impl std::borrow::Borrow<reflected::Field>) -> String {
+            fn get_value(&self, field: &'static reflected::Field) -> String {
                 use std::borrow::Borrow;
                 let field = field.borrow();
 
@@ -89,7 +89,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn set_value(&mut self, field: impl std::borrow::Borrow<reflected::Field>, value: &str) {
+            fn set_value(&mut self, field: &'static reflected::Field, value: &str) {
                 use reflected::TryIntoVal;
                 use std::borrow::Borrow;
                 let field = field.borrow();
@@ -121,7 +121,7 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
 
         res = quote! {
             #res
-            #name: reflected::Field {
+            #name: &reflected::Field {
                 name: #name_string,
                 tp: reflected::Type::#field_type,
                 type_string: #type_string,
@@ -142,7 +142,7 @@ fn fields_struct(fields: &Vec<Field>) -> TokenStream2 {
         let name = &field.name;
         res = quote! {
             #res
-            pub #name: reflected::Field,
+            pub #name: &'static reflected::Field,
         }
     }
 
