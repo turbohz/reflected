@@ -107,4 +107,16 @@ mod test {
 
         assert_eq!(new_bd, user.birthday);
     }
+
+    #[test]
+    fn rename() {
+        #[derive(Reflected, Default)]
+        struct Rename {
+            #[name(Renamed_table)]
+            id:   usize,
+            name: String,
+        }
+
+        assert_eq!(Rename::type_name(), "Renamed_table")
+    }
 }

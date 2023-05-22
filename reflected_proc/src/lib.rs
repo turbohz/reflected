@@ -3,7 +3,7 @@ use std::str::FromStr;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    parse_macro_input, Data, DeriveInput, Fields, FieldsNamed, Ident, Type,
+    parse_macro_input, Attribute, Data, DeriveInput, Fields, FieldsNamed, Ident, Meta, NestedMeta, Type,
     __private::{Span, TokenStream2},
 };
 
@@ -12,7 +12,7 @@ use crate::field::Field;
 mod field;
 
 /// Data must also derive `Default`
-#[proc_macro_derive(Reflected, attributes(unique, secure))]
+#[proc_macro_derive(Reflected, attributes(unique, secure, name))]
 pub fn reflected(stream: TokenStream) -> TokenStream {
     let mut stream = parse_macro_input!(stream as DeriveInput);
 
@@ -26,17 +26,23 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
         _ => panic!(),
     };
 
-    let fields = parse_fields(struct_fields);
+    let (rename, fields) = parse_fields(struct_fields);
 
-    let name = &stream.ident;
-    let name_string = TokenStream2::from_str(&format!("\"{name}\"")).unwrap();
+    let name = stream.ident.clone();
+
+    let name_string = if let Some(rename) = rename {
+        TokenStream2::from_str(&format!("\"{rename}\""))
+    } else {
+        TokenStream2::from_str(&format!("\"{name}\""))
+    }
+    .unwrap();
 
     let fields_struct_name = Ident::new(&format!("{name}Fields"), Span::call_site());
 
     let fields_struct = fields_struct(&fields);
-    let fields_const_var = fields_const_var(name, &fields);
-    let fields_reflect = fields_reflect(name, &fields);
-    let simple_fields_reflect = simple_fields_reflect(name, &fields);
+    let fields_const_var = fields_const_var(&name, &fields);
+    let fields_reflect = fields_reflect(&name, &fields);
+    let simple_fields_reflect = simple_fields_reflect(&name, &fields);
     let fields_get_value = fields_get_value(&fields);
     let fields_set_value = fields_set_value(&fields);
 
@@ -216,8 +222,10 @@ fn fields_set_value(fields: &Vec<Field>) -> TokenStream2 {
     res
 }
 
-fn parse_fields(fields: &FieldsNamed) -> Vec<Field> {
-    fields
+fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
+    let mut rename: Option<String> = None;
+
+    let fields: Vec<Field> = fields
         .named
         .iter()
         .map(|field| {
@@ -233,7 +241,13 @@ fn parse_fields(fields: &FieldsNamed) -> Vec<Field> {
             let attrs: Vec<String> = field
                 .attrs
                 .iter()
-                .map(|a| a.path.segments.first().unwrap().ident.to_string())
+                .map(|a| {
+                    let name = get_attribute_name(a);
+                    if name == "name" {
+                        rename = get_attribute_value(a).expect("name attribute should have value").into();
+                    }
+                    name
+                })
                 .collect();
 
             let unique = attrs.contains(&"unique".to_string());
@@ -246,5 +260,20 @@ fn parse_fields(fields: &FieldsNamed) -> Vec<Field> {
                 secure,
             }
         })
-        .collect()
+        .collect();
+
+    (rename, fields)
+}
+
+fn get_attribute_name(attribute: &Attribute) -> String {
+    attribute.path.segments.first().unwrap().ident.to_string()
+}
+
+fn get_attribute_value(attribute: &Attribute) -> Option<String> {
+    if let Ok(Meta::List(meta_list)) = attribute.parse_meta() {
+        if let NestedMeta::Meta(Meta::Path(path)) = &meta_list.nested[0] {
+            return Some(path.segments.last()?.ident.to_string());
+        }
+    }
+    None
 }
