@@ -3,16 +3,16 @@ use std::ops::Deref;
 use crate::Type;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
-pub struct Field {
-    pub name:        &'static str,
+pub struct Field<'a> {
+    pub name:        &'a str,
     pub tp:          Type,
-    pub parent_name: &'static str,
+    pub parent_name: &'a str,
     pub unique:      bool,
     pub secure:      bool,
     pub optional:    bool,
 }
 
-impl Field {
+impl Field<'_> {
     pub fn is_id(&self) -> bool {
         self.name == "id"
     }
@@ -26,7 +26,7 @@ impl Field {
     }
 }
 
-impl Deref for Field {
+impl Deref for Field<'_> {
     type Target = Type;
     fn deref(&self) -> &Self::Target {
         &self.tp

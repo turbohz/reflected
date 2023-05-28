@@ -17,13 +17,13 @@ pub use to_reflected_val::*;
 pub trait Reflected: Default {
     fn type_name() -> &'static str;
 
-    fn fields() -> &'static [&'static Field];
-    fn simple_fields() -> &'static [&'static Field];
+    fn fields() -> &'static [&'static Field<'static>];
+    fn simple_fields() -> &'static [&'static Field<'static>];
 
     fn get_value(&self, field: &'static Field) -> String;
     fn set_value(&mut self, field: &'static Field, value: Option<&str>);
 
-    fn field_by_name(name: &str) -> &'static Field {
+    fn field_by_name(name: &str) -> &'static Field<'static> {
         Self::fields().iter().find(|a| a.name == name).unwrap()
     }
 

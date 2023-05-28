@@ -64,19 +64,19 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 #name_string
             }
 
-            fn fields() -> &'static [&'static reflected::Field] {
+            fn fields() -> &'static [&'static reflected::Field<'static>] {
                 &[
                     #fields_reflect
                 ]
             }
 
-            fn simple_fields() -> &'static [&'static reflected::Field] {
+            fn simple_fields() -> &'static [&'static reflected::Field<'static>] {
                 &[
                     #simple_fields_reflect
                 ]
             }
 
-            fn get_value(&self, field: &'static reflected::Field) -> String {
+            fn get_value(&self, field: &'static reflected::Field<'static>) -> String {
                 use std::borrow::Borrow;
                 use reflected::ToReflectedString;
                 let field = field.borrow();
@@ -91,7 +91,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn set_value(&mut self, field: &'static reflected::Field, value: Option<&str>) {
+            fn set_value(&mut self, field: &'static reflected::Field<'static>, value: Option<&str>) {
                 use reflected::ToReflectedVal;
                 use std::borrow::Borrow;
                 let field = field.borrow();
@@ -154,7 +154,7 @@ fn fields_struct(fields: &Vec<Field>) -> TokenStream2 {
         let name = &field.name;
         res = quote! {
             #res
-            pub #name: &'static reflected::Field,
+            pub #name: &'static reflected::Field<'static>,
         }
     }
 
