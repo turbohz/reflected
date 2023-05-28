@@ -1,9 +1,10 @@
 use std::str::FromStr;
 
 use proc_macro::TokenStream;
-use quote::quote;
+use quote::{quote, ToTokens};
 use syn::{
-    parse_macro_input, Attribute, Data, DeriveInput, Fields, FieldsNamed, Ident, Meta, NestedMeta, Type,
+    parse_macro_input, Attribute, Data, DeriveInput, Fields, FieldsNamed, GenericArgument, Ident, Meta,
+    NestedMeta, PathArguments, Type,
     __private::{Span, TokenStream2},
 };
 
@@ -77,6 +78,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
 
             fn get_value(&self, field: &'static reflected::Field) -> String {
                 use std::borrow::Borrow;
+                use reflected::ToReflectedString;
                 let field = field.borrow();
 
                 if field.is_custom() {
@@ -89,8 +91,8 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn set_value(&mut self, field: &'static reflected::Field, value: &str) {
-                use reflected::TryIntoVal;
+            fn set_value(&mut self, field: &'static reflected::Field, value: Option<&str>) {
+                use reflected::ToReflectedVal;
                 use std::borrow::Borrow;
                 let field = field.borrow();
                 match field.name {
@@ -118,16 +120,28 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
 
         let unique = field.unique;
         let secure = field.secure;
+        let optional = field.optional;
+
+        let tp = if optional {
+            quote! {
+                tp: reflected::Type::#field_type.to_optional()
+            }
+        } else {
+            quote! {
+                tp: reflected::Type::#field_type
+            }
+        };
 
         res = quote! {
             #res
             #name: &reflected::Field {
                 name: #name_string,
-                tp: reflected::Type::#field_type,
+                #tp,
                 type_string: #type_string,
                 parent_name: #type_name,
                 unique: #unique,
                 secure: #secure,
+                optional: #optional,
             },
         }
     }
@@ -193,9 +207,28 @@ fn fields_get_value(fields: &Vec<Field>) -> TokenStream2 {
         let field_name = &field.name;
         let name_string = field.name_as_string();
 
-        res = quote! {
-            #res
-            #name_string => self.#field_name.to_string(),
+        if field.is_bool() {
+            if field.optional {
+                res = quote! {
+                    #res
+                    #name_string => self.#field_name.map(|a| if a { "1" } else { "0" }.to_string()).unwrap_or("NULL".to_string()),
+                }
+            } else {
+                res = quote! {
+                    #res
+                    #name_string => if self.#field_name { "1" } else { "0" }.to_string(),
+                }
+            }
+        } else if field.optional {
+            res = quote! {
+                #res
+                #name_string => self.#field_name.to_reflected_string(),
+            }
+        } else {
+            res = quote! {
+                #res
+                #name_string => self.#field_name.to_string(),
+            }
         }
     }
 
@@ -213,9 +246,40 @@ fn fields_set_value(fields: &Vec<Field>) -> TokenStream2 {
         let field_name = &field.name;
         let name_string = field.name_as_string();
 
-        res = quote! {
-            #res
-            #name_string => self.#field_name = value.try_into_val(),
+        if field.is_bool() {
+            if field.optional {
+                res = quote! {
+                    #res
+                    #name_string =>  {
+                        self.#field_name = value.map(|a| match a {
+                            "0" => false,
+                            "1" => true,
+                            _ => unreachable!("Invalid value in bool: {value:?}")
+                        })
+                    },
+                }
+            } else {
+                res = quote! {
+                    #res
+                    #name_string =>  {
+                        self.#field_name = match value.unwrap() {
+                            "0" => false,
+                            "1" => true,
+                            _ => unreachable!("Invalid value in bool: {value:?}")
+                        }
+                    },
+                }
+            }
+        } else if field.optional {
+            res = quote! {
+                #res
+                #name_string => self.#field_name = value.map(|a| a.to_reflected_val()),
+            }
+        } else {
+            res = quote! {
+                #res
+                #name_string => self.#field_name = value.unwrap().to_reflected_val(),
+            }
         }
     }
 
@@ -229,14 +293,35 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
         .named
         .iter()
         .map(|field| {
-            let name = field.ident.as_ref().unwrap();
+            let name = field.ident.as_ref().unwrap().clone();
+            let mut optional = false;
 
             let path = match &field.ty {
                 Type::Path(path) => path,
                 _ => unreachable!("invalid parse_fields"),
             };
 
-            let tp = &path.path.segments.first().unwrap().ident;
+            let mut tp = path.path.segments.first().unwrap().ident.clone();
+
+            //            dbg!(&tp);
+
+            if tp == "Option" {
+                optional = true;
+                let args = &path.path.segments.first().unwrap().arguments;
+                if let PathArguments::AngleBracketed(args) = args {
+                    if let GenericArgument::Type(generic_tp) = args.args.first().unwrap() {
+                        let ident = generic_tp.to_token_stream().to_string();
+                        let ident = Ident::new(&ident, Span::call_site());
+                        //                        dbg!(&ident);
+                        //name = ident.clone();
+                        tp = ident;
+                    } else {
+                        unreachable!()
+                    }
+                } else {
+                    unreachable!()
+                }
+            }
 
             let attrs: Vec<String> = field
                 .attrs
@@ -254,10 +339,11 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
             let secure = attrs.contains(&"secure".to_string());
 
             Field {
-                name: name.clone(),
-                tp: tp.clone(),
+                name,
+                tp,
                 unique,
                 secure,
+                optional,
             }
         })
         .collect();

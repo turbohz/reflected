@@ -6,10 +6,11 @@ use crate::TokenStream2;
 
 #[derive(Debug)]
 pub(crate) struct Field {
-    pub(crate) name:   Ident,
-    pub(crate) tp:     Ident,
-    pub(crate) unique: bool,
-    pub(crate) secure: bool,
+    pub(crate) name:     Ident,
+    pub(crate) tp:       Ident,
+    pub(crate) unique:   bool,
+    pub(crate) secure:   bool,
+    pub(crate) optional: bool,
 }
 
 impl Field {
@@ -35,6 +36,10 @@ impl Field {
 
     pub(crate) fn is_simple(&self) -> bool {
         !self.id() && !self.custom() && !self.is_foreign_id()
+    }
+
+    pub(crate) fn is_bool(&self) -> bool {
+        self.field_type() == "Bool"
     }
 
     pub(crate) fn field_type(&self) -> Ident {

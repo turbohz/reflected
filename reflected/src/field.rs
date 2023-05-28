@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use crate::Type;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
@@ -8,6 +10,7 @@ pub struct Field {
     pub parent_name: &'static str,
     pub unique:      bool,
     pub secure:      bool,
+    pub optional:    bool,
 }
 
 impl Field {
@@ -19,32 +22,15 @@ impl Field {
         self.name.contains("_id")
     }
 
-    pub fn is_custom(&self) -> bool {
-        matches!(self.tp, Type::Custom)
-    }
-
     pub fn is_simple(&self) -> bool {
         !self.is_id() && !self.is_custom() && !self.is_foreign_id()
     }
+}
 
-    pub fn is_text(&self) -> bool {
-        matches!(self.tp, Type::Text)
-    }
-
-    pub fn is_number(&self) -> bool {
-        matches!(self.tp, Type::Integer | Type::Float)
-    }
-
-    pub fn is_date(&self) -> bool {
-        matches!(self.tp, Type::Date)
-    }
-
-    pub fn is_decimal(&self) -> bool {
-        matches!(self.tp, Type::Decimal)
-    }
-
-    pub fn is_bool(&self) -> bool {
-        matches!(self.tp, Type::Bool)
+impl Deref for Field {
+    type Target = Type;
+    fn deref(&self) -> &Self::Target {
+        &self.tp
     }
 }
 
@@ -63,6 +49,7 @@ mod test {
             parent_name: "",
             unique:      false,
             secure:      false,
+            optional:    false,
         };
 
         let mut map = HashMap::<&'static Field, String>::default();

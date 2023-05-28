@@ -1,6 +1,7 @@
 pub mod field;
 pub mod field_type;
-pub mod try_into_val;
+pub mod to_reflected_string;
+pub mod to_reflected_val;
 
 use chrono::Utc;
 pub use field::*;
@@ -10,7 +11,8 @@ use rand::{
     random, thread_rng, Rng,
 };
 use rust_decimal::Decimal;
-pub use try_into_val::*;
+pub use to_reflected_string::*;
+pub use to_reflected_val::*;
 
 pub trait Reflected: Default {
     fn type_name() -> &'static str;
@@ -19,7 +21,7 @@ pub trait Reflected: Default {
     fn simple_fields() -> &'static [&'static Field];
 
     fn get_value(&self, field: &'static Field) -> String;
-    fn set_value(&mut self, field: &'static Field, value: &str);
+    fn set_value(&mut self, field: &'static Field, value: Option<&str>);
 
     fn field_by_name(name: &str) -> &'static Field {
         Self::fields().iter().find(|a| a.name == name).unwrap()
@@ -37,16 +39,16 @@ pub trait Reflected: Default {
         for field in Self::fields() {
             if field.is_text() {
                 let str = Alphanumeric.sample_string(&mut rng, 8);
-                res.set_value(field, &str);
+                res.set_value(field, Some(&str));
             } else if field.is_number() {
                 let val: u32 = rng.gen_range(0..100);
                 let val = val.to_string();
-                res.set_value(field, &val);
+                res.set_value(field, Some(&val));
             } else if field.is_date() {
-                res.set_value(field, &Utc::now().to_string());
+                res.set_value(field, Some(&Utc::now().to_string()));
             } else if field.is_decimal() {
                 let dec = Decimal::new(random(), rng.gen_range(0..28));
-                res.set_value(field, &dec.to_string());
+                res.set_value(field, Some(&dec.to_string()));
             };
         }
 
