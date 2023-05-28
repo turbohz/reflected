@@ -13,7 +13,7 @@ use crate::field::Field;
 mod field;
 
 /// Data must also derive `Default`
-#[proc_macro_derive(Reflected, attributes(unique, secure, name))]
+#[proc_macro_derive(Reflected, attributes(unique, name))]
 pub fn reflected(stream: TokenStream) -> TokenStream {
     let mut stream = parse_macro_input!(stream as DeriveInput);
 
@@ -118,7 +118,6 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
         let name_string = field.name_as_string();
 
         let unique = field.unique;
-        let secure = field.secure;
         let optional = field.optional;
 
         let tp = if optional {
@@ -138,7 +137,6 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
                 #tp,
                 parent_name: #type_name,
                 unique: #unique,
-                secure: #secure,
                 optional: #optional,
             },
         }
@@ -334,13 +332,11 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
                 .collect();
 
             let unique = attrs.contains(&"unique".to_string());
-            let secure = attrs.contains(&"secure".to_string());
 
             Field {
                 name,
                 tp,
                 unique,
-                secure,
                 optional,
             }
         })

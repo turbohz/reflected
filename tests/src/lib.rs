@@ -10,7 +10,6 @@ struct User {
     id:       usize,
     #[unique]
     name:     String,
-    #[secure]
     password: String,
 
     birthday:  DateTime<Utc>,
@@ -41,7 +40,7 @@ mod test {
     fn fields() {
         assert!(User::FIELDS.id.is_id());
         assert!(User::FIELDS.name.unique);
-        assert!(User::FIELDS.password.secure);
+        assert!(User::FIELDS.password.is_secure());
         assert!(User::FIELDS.custom.is_custom());
         assert!(User::FIELDS.custom_id.is_foreign_id());
         assert!(User::FIELDS.birthday.is_date());

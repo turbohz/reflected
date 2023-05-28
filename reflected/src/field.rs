@@ -8,7 +8,6 @@ pub struct Field<'a> {
     pub tp:          Type,
     pub parent_name: &'a str,
     pub unique:      bool,
-    pub secure:      bool,
     pub optional:    bool,
 }
 
@@ -23,6 +22,10 @@ impl Field<'_> {
 
     pub fn is_simple(&self) -> bool {
         !self.is_id() && !self.is_custom() && !self.is_foreign_id()
+    }
+
+    pub fn is_secure(&self) -> bool {
+        self.name == "password"
     }
 }
 
@@ -46,7 +49,6 @@ mod test {
             tp:          Type::Float,
             parent_name: "",
             unique:      false,
-            secure:      false,
             optional:    false,
         };
 
