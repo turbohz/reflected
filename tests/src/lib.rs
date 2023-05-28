@@ -19,6 +19,7 @@ mod test {
         custom:    CustomField,
         custom_id: usize,
         cash:      Decimal,
+        is_poros:  bool,
     }
 
     #[derive(Default, PartialEq, Debug)]
@@ -33,8 +34,9 @@ mod test {
         assert!(User::FIELDS.custom_id.is_foreign_id());
         assert!(User::FIELDS.birthday.is_date());
         assert!(User::FIELDS.cash.is_decimal());
-        assert_eq!(User::fields().len(), 8);
-        assert_eq!(User::simple_fields().len(), 5);
+        assert!(User::FIELDS.is_poros.is_bool());
+        assert_eq!(User::fields().len(), 9);
+        assert_eq!(User::simple_fields().len(), 6);
     }
 
     #[test]
@@ -50,6 +52,7 @@ mod test {
             custom: CustomField,
             custom_id: 0,
             cash: Decimal::from_str("100.25").unwrap(),
+            is_poros: false,
         };
 
         assert_eq!(user.get_value(User::FIELDS.name), "peter".to_string());
@@ -57,6 +60,7 @@ mod test {
         assert_eq!(user.get_value(User::FIELDS.age), "15".to_string());
         assert_eq!(user.get_value(User::FIELDS.birthday), birthday.to_string());
         assert_eq!(user.get_value(User::FIELDS.cash), "100.25".to_string());
+        assert_eq!(user.get_value(User::FIELDS.is_poros), "false".to_string());
     }
 
     #[test]
@@ -70,6 +74,7 @@ mod test {
             custom:    CustomField,
             custom_id: 0,
             cash:      Default::default(),
+            is_poros:  false,
         };
 
         let new_bd = Utc::now();
@@ -79,12 +84,14 @@ mod test {
         user.set_value(User::FIELDS.age, "19");
         user.set_value(User::FIELDS.birthday, &new_bd.to_string());
         user.set_value(User::FIELDS.cash, "100.71");
+        user.set_value(User::FIELDS.is_poros, "true");
 
         assert_eq!(user.get_value(User::FIELDS.name), "parker".to_string());
         assert_eq!(user.get_value(User::FIELDS.password), "soika".to_string());
         assert_eq!(user.get_value(User::FIELDS.age), "19".to_string());
         assert_eq!(user.get_value(User::FIELDS.birthday), new_bd.to_string());
         assert_eq!(user.get_value(User::FIELDS.cash), "100.71".to_string());
+        assert_eq!(user.get_value(User::FIELDS.is_poros), "true".to_string());
         assert_eq!(
             user,
             User {
@@ -96,6 +103,7 @@ mod test {
                 custom:    CustomField,
                 custom_id: 0,
                 cash:      Decimal::from_str("100.71").unwrap(),
+                is_poros:  true,
             }
         );
     }

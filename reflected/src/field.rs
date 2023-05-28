@@ -42,6 +42,10 @@ impl Field {
     pub fn is_decimal(&self) -> bool {
         matches!(self.tp, Type::Decimal)
     }
+
+    pub fn is_bool(&self) -> bool {
+        matches!(self.tp, Type::Bool)
+    }
 }
 
 #[cfg(test)]

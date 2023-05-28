@@ -5,5 +5,6 @@ pub enum Type {
     Text,
     Date,
     Decimal,
+    Bool,
     Custom,
 }

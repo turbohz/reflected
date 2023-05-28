@@ -44,6 +44,7 @@ impl Field {
         let custom = Ident::new("Custom", Span::call_site());
         let date = Ident::new("Date", Span::call_site());
         let decimal = Ident::new("Decimal", Span::call_site());
+        let bool = Ident::new("Bool", Span::call_site());
 
         match self.tp.to_string().as_str() {
             "f32" | "f64" => float,
@@ -51,6 +52,7 @@ impl Field {
             "String" => text,
             "DateTime" => date,
             "Decimal" => decimal,
+            "bool" => bool,
             _ => custom,
         }
     }
