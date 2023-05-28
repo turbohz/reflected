@@ -18,10 +18,6 @@ impl Field {
         TokenStream2::from_str(&format!("\"{}\"", self.name)).unwrap()
     }
 
-    pub(crate) fn type_as_string(&self) -> TokenStream2 {
-        TokenStream2::from_str(&format!("\"{}\"", self.tp)).unwrap()
-    }
-
     pub(crate) fn id(&self) -> bool {
         self.name == Ident::new("id", Span::call_site())
     }

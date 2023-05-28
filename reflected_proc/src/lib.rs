@@ -116,7 +116,6 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
         let field_type = field.field_type();
 
         let name_string = field.name_as_string();
-        let type_string = field.type_as_string();
 
         let unique = field.unique;
         let secure = field.secure;
@@ -137,7 +136,6 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
             #name: &reflected::Field {
                 name: #name_string,
                 #tp,
-                type_string: #type_string,
                 parent_name: #type_name,
                 unique: #unique,
                 secure: #secure,

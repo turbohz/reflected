@@ -6,7 +6,6 @@ use crate::Type;
 pub struct Field {
     pub name:        &'static str,
     pub tp:          Type,
-    pub type_string: &'static str,
     pub parent_name: &'static str,
     pub unique:      bool,
     pub secure:      bool,
@@ -45,7 +44,6 @@ mod test {
         let field: &'static Field = &Field {
             name:        "",
             tp:          Type::Float,
-            type_string: "",
             parent_name: "",
             unique:      false,
             secure:      false,
