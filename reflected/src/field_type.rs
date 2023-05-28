@@ -9,7 +9,7 @@ pub enum OptionalType {
 }
 
 impl OptionalType {
-    const fn from_type(tp: &Type) -> Self {
+    pub const fn from_type(tp: &Type) -> Self {
         match tp {
             Type::Float => OptionalType::Float,
             Type::Integer => OptionalType::Integer,
@@ -21,7 +21,7 @@ impl OptionalType {
         }
     }
 
-    const fn to_type(&self) -> Type {
+    pub const fn to_type(&self) -> Type {
         match self {
             OptionalType::Float => Type::Float,
             OptionalType::Integer => Type::Integer,
