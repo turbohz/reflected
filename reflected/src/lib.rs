@@ -34,24 +34,30 @@ pub trait Reflected: Default {
     fn random() -> Self {
         let mut res = Self::default();
 
-        let mut rng = thread_rng();
-
-        for field in Self::fields() {
-            if field.is_text() {
-                let str = Alphanumeric.sample_string(&mut rng, 8);
-                res.set_value(field, Some(&str));
-            } else if field.is_number() {
-                let val: u32 = rng.gen_range(0..100);
-                let val = val.to_string();
-                res.set_value(field, Some(&val));
-            } else if field.is_date() {
-                res.set_value(field, Some(&Utc::now().to_string()));
-            } else if field.is_decimal() {
-                let dec = Decimal::new(random(), rng.gen_range(0..28));
-                res.set_value(field, Some(&dec.to_string()));
-            };
+        for field in Self::simple_fields() {
+            res.set_value(field, random_val(&field.tp).as_deref());
         }
 
         res
+    }
+}
+
+fn random_val(tp: &Type) -> Option<String> {
+    let mut rng = thread_rng();
+
+    match tp {
+        Type::Text => Alphanumeric.sample_string(&mut rng, 8).into(),
+        Type::Integer | Type::Float => rng.gen_range(0..100).to_string().into(),
+        Type::Date => Utc::now().to_string().into(),
+        Type::Decimal => Decimal::new(random(), rng.gen_range(0..28)).to_string().into(),
+        Type::Bool => rng.gen_range(0..1).to_string().into(),
+        Type::Optional(opt) => {
+            if rng.gen() {
+                random_val(&opt.to_type())
+            } else {
+                None
+            }
+        }
+        _ => unreachable!("Failed to gen random value for: {tp:?}"),
     }
 }

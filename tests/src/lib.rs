@@ -192,4 +192,10 @@ mod test {
 
         assert_eq!(Rename::type_name(), "Renamed_table")
     }
+
+    #[test]
+    fn random() {
+        let _user = User::random();
+        //        dbg!(user);
+    }
 }
