@@ -1,17 +1,18 @@
-use std::ops::Deref;
+use std::{marker::PhantomData, ops::Deref};
 
 use crate::Type;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
-pub struct Field<'a> {
+pub struct Field<'a, T> {
     pub name:        &'a str,
     pub tp:          Type,
     pub parent_name: &'a str,
     pub unique:      bool,
     pub optional:    bool,
+    pub _p:          PhantomData<T>,
 }
 
-impl Field<'_> {
+impl<T> Field<'_, T> {
     pub fn is_id(&self) -> bool {
         self.name == "id"
     }
@@ -29,7 +30,7 @@ impl Field<'_> {
     }
 }
 
-impl Deref for Field<'_> {
+impl<T> Deref for Field<'_, T> {
     type Target = Type;
     fn deref(&self) -> &Self::Target {
         &self.tp
@@ -38,21 +39,22 @@ impl Deref for Field<'_> {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
+    use std::{collections::HashMap, marker::PhantomData};
 
     use crate::{Field, Type};
 
     #[test]
     fn store_in_map() {
-        let field: &'static Field = &Field {
+        let field: &'static Field<()> = &Field {
             name:        "",
             tp:          Type::Float,
             parent_name: "",
             unique:      false,
             optional:    false,
+            _p:          PhantomData,
         };
 
-        let mut map = HashMap::<&'static Field, String>::default();
+        let mut map = HashMap::<&'static Field<()>, String>::default();
         map.insert(field, Default::default());
     }
 }

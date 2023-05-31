@@ -14,16 +14,16 @@ use rust_decimal::Decimal;
 pub use to_reflected_string::*;
 pub use to_reflected_val::*;
 
-pub trait Reflected: Default {
+pub trait Reflected: Default + 'static {
     fn type_name() -> &'static str;
 
-    fn fields() -> &'static [&'static Field<'static>];
-    fn simple_fields() -> &'static [&'static Field<'static>];
+    fn fields() -> &'static [&'static Field<'static, Self>];
+    fn simple_fields() -> &'static [&'static Field<'static, Self>];
 
-    fn get_value(&self, field: &'static Field) -> String;
-    fn set_value(&mut self, field: &'static Field, value: Option<&str>);
+    fn get_value(&self, field: &'static Field<'static, Self>) -> String;
+    fn set_value(&mut self, field: &'static Field<'static, Self>, value: Option<&str>);
 
-    fn field_by_name(name: &str) -> &'static Field<'static> {
+    fn field_by_name(name: &str) -> &'static Field<'static, Self> {
         Self::fields().iter().find(|a| a.name == name).unwrap()
     }
 

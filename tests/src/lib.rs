@@ -6,7 +6,7 @@ use rust_decimal::Decimal;
 struct CustomField;
 
 #[derive(Reflected, Default, PartialEq, Debug)]
-struct User {
+pub struct User {
     id:       usize,
     #[unique]
     name:     String,
@@ -182,8 +182,8 @@ mod test {
 
     #[test]
     fn rename() {
-        #[derive(Reflected, Default)]
-        struct Rename {
+        #[derive(Reflected, Debug, Default)]
+        pub struct Rename {
             #[name(Renamed_table)]
             id:   usize,
             name: String,

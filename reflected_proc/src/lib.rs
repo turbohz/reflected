@@ -40,7 +40,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
 
     let fields_struct_name = Ident::new(&format!("{name}Fields"), Span::call_site());
 
-    let fields_struct = fields_struct(&fields);
+    let fields_struct = fields_struct(&name, &fields);
     let fields_const_var = fields_const_var(&name, &fields);
     let fields_reflect = fields_reflect(&name, &fields);
     let simple_fields_reflect = simple_fields_reflect(&name, &fields);
@@ -64,19 +64,19 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 #name_string
             }
 
-            fn fields() -> &'static [&'static reflected::Field<'static>] {
+            fn fields() -> &'static [&'static reflected::Field<'static, Self>] {
                 &[
                     #fields_reflect
                 ]
             }
 
-            fn simple_fields() -> &'static [&'static reflected::Field<'static>] {
+            fn simple_fields() -> &'static [&'static reflected::Field<'static, Self>] {
                 &[
                     #simple_fields_reflect
                 ]
             }
 
-            fn get_value(&self, field: &'static reflected::Field<'static>) -> String {
+            fn get_value(&self, field: &'static reflected::Field<'static, Self>) -> String {
                 use std::borrow::Borrow;
                 use reflected::ToReflectedString;
                 let field = field.borrow();
@@ -91,7 +91,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn set_value(&mut self, field: &'static reflected::Field<'static>, value: Option<&str>) {
+            fn set_value(&mut self, field: &'static reflected::Field<'static, Self>, value: Option<&str>) {
                 use reflected::ToReflectedVal;
                 use std::borrow::Borrow;
                 let field = field.borrow();
@@ -138,6 +138,7 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
                 parent_name: #type_name,
                 unique: #unique,
                 optional: #optional,
+                _p: std::marker::PhantomData,
             },
         }
     }
@@ -145,14 +146,14 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
     res
 }
 
-fn fields_struct(fields: &Vec<Field>) -> TokenStream2 {
+fn fields_struct(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
     let mut res = quote!();
 
     for field in fields {
         let name = &field.name;
         res = quote! {
             #res
-            pub #name: &'static reflected::Field<'static>,
+            pub #name: &'static reflected::Field<'static, #type_name>,
         }
     }
 
