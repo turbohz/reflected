@@ -1,8 +1,13 @@
-use std::{marker::PhantomData, ops::Deref};
+use std::{
+    any::type_name,
+    hash::{Hash, Hasher},
+    marker::PhantomData,
+    ops::Deref,
+};
 
 use crate::Type;
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug)]
 pub struct Field<'a, T> {
     pub name:        &'a str,
     pub tp:          Type,
@@ -37,15 +42,40 @@ impl<T> Deref for Field<'_, T> {
     }
 }
 
+impl<'a, T> Hash for Field<'a, T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.tp.hash(state);
+        self.parent_name.hash(state);
+        self.unique.hash(state);
+        self.optional.hash(state);
+        type_name::<T>().hash(state);
+    }
+}
+
+impl<'a, T> PartialEq for Field<'a, T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.name.eq(other.name)
+            && self.tp.eq(&other.tp)
+            && self.parent_name.eq(other.parent_name)
+            && self.unique.eq(&other.unique)
+            && self.optional.eq(&other.optional)
+    }
+}
+
+impl<'a, T> Eq for Field<'a, T> {}
+
 #[cfg(test)]
 mod test {
     use std::{collections::HashMap, marker::PhantomData};
 
     use crate::{Field, Type};
 
+    struct Strekta {}
+
     #[test]
     fn store_in_map() {
-        let field: &'static Field<()> = &Field {
+        let field: &'static Field<Strekta> = &Field {
             name:        "",
             tp:          Type::Float,
             parent_name: "",
@@ -54,7 +84,7 @@ mod test {
             _p:          PhantomData,
         };
 
-        let mut map = HashMap::<&'static Field<()>, String>::default();
+        let mut map = HashMap::<&'static Field<Strekta>, String>::default();
         map.insert(field, Default::default());
     }
 }
