@@ -1,5 +1,7 @@
 [workspace]
 
+resolver = "2"
+
 members = ["tests", "reflected", "reflected_proc"]
 
 default-members = ["reflected"]

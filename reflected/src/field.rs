@@ -7,6 +7,8 @@ use std::{
 
 use crate::Type;
 
+pub type FieldRef<T> = &'static Field<'static, T>;
+
 #[derive(Debug)]
 pub struct Field<'a, T> {
     pub name:        &'a str,
