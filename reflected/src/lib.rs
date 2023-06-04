@@ -12,7 +12,7 @@ pub use field::*;
 pub use field_type::*;
 use rand::{
     distributions::{Alphanumeric, DistString},
-    random, thread_rng, Rng,
+    thread_rng, Rng,
 };
 use rust_decimal::Decimal;
 pub use to_reflected_string::*;
@@ -53,7 +53,9 @@ fn random_val(tp: &Type) -> Option<String> {
         Type::Text => Alphanumeric.sample_string(&mut rng, 8).into(),
         Type::Integer | Type::Float => rng.gen_range(0..100).to_string().into(),
         Type::Date => Utc::now().to_string().into(),
-        Type::Decimal => Decimal::new(random(), rng.gen_range(0..10)).to_string().into(),
+        Type::Decimal => Decimal::new(rng.gen_range(u32::MIN..u32::MAX).into(), rng.gen_range(0..6))
+            .to_string()
+            .into(),
         Type::Bool => rng.gen_range(0..2).to_string().into(),
         Type::Optional(opt) => {
             if rng.gen() {
