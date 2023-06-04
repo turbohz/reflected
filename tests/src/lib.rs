@@ -209,7 +209,7 @@ mod test {
     #[test]
     fn random() {
         let _user = User::random();
-        //        dbg!(user);
+        dbg!(_user);
     }
 
     #[test]

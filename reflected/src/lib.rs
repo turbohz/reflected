@@ -54,7 +54,7 @@ fn random_val(tp: &Type) -> Option<String> {
         Type::Integer | Type::Float => rng.gen_range(0..100).to_string().into(),
         Type::Date => Utc::now().to_string().into(),
         Type::Decimal => Decimal::new(random(), rng.gen_range(0..28)).to_string().into(),
-        Type::Bool => rng.gen_range(0..1).to_string().into(),
+        Type::Bool => rng.gen_range(0..2).to_string().into(),
         Type::Optional(opt) => {
             if rng.gen() {
                 random_val(&opt.to_type())
