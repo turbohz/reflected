@@ -31,10 +31,6 @@ impl<T> Field<'_, T> {
     pub fn is_simple(&self) -> bool {
         !self.is_id() && !self.is_custom() && !self.is_foreign_id()
     }
-
-    pub fn is_secure(&self) -> bool {
-        self.name == "password"
-    }
 }
 
 impl<T> Deref for Field<'_, T> {

@@ -11,10 +11,9 @@ struct CustomField;
 
 #[derive(Reflected, Default, PartialEq, Debug)]
 pub struct User {
-    id:       usize,
+    id:   usize,
     #[unique]
-    name:     String,
-    password: String,
+    name: String,
 
     birthday:  DateTime<Utc>,
     age:       usize,
@@ -54,7 +53,6 @@ mod test {
     fn fields() {
         assert!(User::FIELDS.id.is_id());
         assert!(User::FIELDS.name.unique);
-        assert!(User::FIELDS.password.is_secure());
         assert!(User::FIELDS.custom.is_custom());
         assert!(User::FIELDS.custom_id.is_foreign_id());
         assert!(User::FIELDS.birthday.is_date());
@@ -73,8 +71,8 @@ mod test {
         assert!(User::FIELDS.decimal_opt.is_optional());
         assert!(User::FIELDS.decimal_opt.is_decimal());
 
-        assert_eq!(User::fields().len(), 13);
-        assert_eq!(User::simple_fields().len(), 10);
+        assert_eq!(User::fields().len(), 12);
+        assert_eq!(User::simple_fields().len(), 9);
     }
 
     #[test]
@@ -84,7 +82,6 @@ mod test {
         let mut user = User {
             id: 0,
             name: "peter".into(),
-            password: "sokol".into(),
             birthday,
             age: 15,
             custom: CustomField,
@@ -98,7 +95,6 @@ mod test {
         };
 
         assert_eq!(user.get_value(User::FIELDS.name), "peter".to_string());
-        assert_eq!(user.get_value(User::FIELDS.password), "sokol".to_string());
         assert_eq!(user.get_value(User::FIELDS.age), "15".to_string());
         assert_eq!(user.get_value(User::FIELDS.birthday), birthday.to_string());
         assert_eq!(user.get_value(User::FIELDS.cash), "100.25".to_string());
@@ -125,7 +121,6 @@ mod test {
         let mut user = User {
             id:          0,
             name:        "peter".into(),
-            password:    "sokol".into(),
             birthday:    Default::default(),
             age:         15,
             custom:      CustomField,
@@ -141,14 +136,12 @@ mod test {
         let new_bd = Utc::now();
 
         user.set_value(User::FIELDS.name, "parker".into());
-        user.set_value(User::FIELDS.password, "soika".into());
         user.set_value(User::FIELDS.age, "19".into());
         user.set_value(User::FIELDS.birthday, Some(&new_bd.to_string()));
         user.set_value(User::FIELDS.cash, "100.71".into());
         user.set_value(User::FIELDS.is_poros, "1".into());
 
         assert_eq!(user.get_value(User::FIELDS.name), "parker".to_string());
-        assert_eq!(user.get_value(User::FIELDS.password), "soika".to_string());
         assert_eq!(user.get_value(User::FIELDS.age), "19".to_string());
         assert_eq!(user.get_value(User::FIELDS.birthday), new_bd.to_string());
         assert_eq!(user.get_value(User::FIELDS.cash), "100.71".to_string());
@@ -179,7 +172,6 @@ mod test {
             User {
                 id:          0,
                 name:        "parker".into(),
-                password:    "soika".into(),
                 birthday:    new_bd,
                 age:         19,
                 custom:      CustomField,
