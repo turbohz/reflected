@@ -3,7 +3,6 @@
 
 pub mod field;
 pub mod field_type;
-pub mod has_variants_field;
 pub mod to_reflected_string;
 pub mod to_reflected_val;
 

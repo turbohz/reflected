@@ -2,7 +2,6 @@
 #![feature(specialization)]
 
 use chrono::{DateTime, Utc};
-use reflected::{has_variants_field::HasVariantsField, FieldRef};
 use reflected_proc::Reflected;
 use rust_decimal::Decimal;
 
@@ -28,22 +27,12 @@ pub struct User {
     decimal_opt: Option<Decimal>,
 }
 
-impl HasVariantsField for User {
-    fn variants_for(field: FieldRef<Self>) -> Option<Vec<String>> {
-        if field == Self::FIELDS.age {
-            vec!["sokol".to_string(), "pokol".to_string()].into()
-        } else {
-            None
-        }
-    }
-}
-
 #[cfg(test)]
 mod test {
     use std::str::FromStr;
 
     use chrono::Utc;
-    use reflected::{has_variants_field::HasVariantsField, Reflected};
+    use reflected::Reflected;
     use reflected_proc::Reflected;
     use rust_decimal::Decimal;
 
@@ -202,14 +191,5 @@ mod test {
     fn random() {
         let _user = User::random();
         dbg!(_user);
-    }
-
-    #[test]
-    fn has_variants_field() {
-        assert_eq!(User::variants_for(User::FIELDS.name), None);
-        assert_eq!(
-            User::variants_for(User::FIELDS.age),
-            Some(vec!["sokol".to_string(), "pokol".to_string()])
-        );
     }
 }
