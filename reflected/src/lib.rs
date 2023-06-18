@@ -37,7 +37,10 @@ pub trait Reflected: Default + 'static {
     fn random() -> Self {
         let mut res = Self::default();
 
-        for field in Self::simple_fields() {
+        for field in Self::fields() {
+            if field.is_custom() {
+                continue;
+            }
             res.set_value(field, random_val(&field.tp).as_deref());
         }
 
