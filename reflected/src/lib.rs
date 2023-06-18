@@ -53,7 +53,7 @@ fn random_val(tp: &Type) -> Option<String> {
 
     match tp {
         Type::Text => Alphanumeric.sample_string(&mut rng, 8).into(),
-        Type::Integer | Type::Float => rng.gen_range(0..100).to_string().into(),
+        Type::Integer | Type::Float => rng.gen_range(0..1000000000).to_string().into(),
         Type::Date => Utc::now().to_string().into(),
         Type::Decimal => Decimal::new(rng.gen_range(u32::MIN..u32::MAX).into(), rng.gen_range(0..6))
             .to_string()
