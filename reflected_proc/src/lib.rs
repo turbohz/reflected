@@ -270,12 +270,14 @@ fn fields_set_value(fields: &Vec<Field>) -> TokenStream2 {
         } else if field.optional {
             res = quote! {
                 #res
-                #name_string => self.#field_name = value.map(|a| a.to_reflected_val()),
+                #name_string => self.#field_name = value.map(|a| a.to_reflected_val()
+                    .expect(&format!("Failed to convert to: {} from: {}", #name_string, a))),
             }
         } else {
             res = quote! {
                 #res
-                #name_string => self.#field_name = value.unwrap().to_reflected_val(),
+                #name_string => self.#field_name = value.unwrap().to_reflected_val()
+                .expect(&format!("Failed to convert to: {} from: {}", #name_string, value.unwrap())),
             }
         }
     }

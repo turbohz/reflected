@@ -50,7 +50,7 @@ impl Field {
             "f32" | "f64" => float,
             "i32" | "u32" | "i64" | "u64" | "isize" | "usize" => integer,
             "String" => text,
-            "DateTime" => date,
+            "NaiveDateTime" => date,
             "Decimal" => decimal,
             "bool" => bool,
             _ => custom,

@@ -1,7 +1,7 @@
 #![allow(incomplete_features)]
 #![feature(specialization)]
 
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 use reflected_proc::Reflected;
 use rust_decimal::Decimal;
 
@@ -14,7 +14,7 @@ pub struct User {
     #[unique]
     name: String,
 
-    birthday:  DateTime<Utc>,
+    birthday:  NaiveDateTime,
     age:       usize,
     custom:    CustomField,
     custom_id: usize,
@@ -31,12 +31,25 @@ pub struct User {
 mod test {
     use std::str::FromStr;
 
-    use chrono::Utc;
+    use chrono::{NaiveDateTime, Utc};
     use reflected::Reflected;
     use reflected_proc::Reflected;
     use rust_decimal::Decimal;
 
     use crate::{CustomField, User};
+
+    #[test]
+    fn convert_date() {
+        let date = Utc::now().naive_utc();
+
+        let date_string = date.to_string();
+
+        dbg!(&date_string);
+
+        let parsed_date = NaiveDateTime::from_str(&date_string);
+
+        dbg!(&parsed_date);
+    }
 
     #[test]
     fn fields() {
@@ -66,7 +79,7 @@ mod test {
 
     #[test]
     fn get() {
-        let birthday = Utc::now();
+        let birthday = Utc::now().naive_utc();
 
         let mut user = User {
             id: 0,
@@ -122,7 +135,7 @@ mod test {
             decimal_opt: None,
         };
 
-        let new_bd = Utc::now();
+        let new_bd = Utc::now().naive_utc();
 
         user.set_value(User::FIELDS.name, "parker".into());
         user.set_value(User::FIELDS.age, "19".into());
