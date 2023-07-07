@@ -37,6 +37,10 @@ impl Field {
         self.field_type() == "Bool"
     }
 
+    pub(crate) fn is_date(&self) -> bool {
+        self.field_type() == "Date"
+    }
+
     pub(crate) fn field_type(&self) -> Ident {
         let float = Ident::new("Float", Span::call_site());
         let integer = Ident::new("Integer", Span::call_site());

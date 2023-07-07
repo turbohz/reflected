@@ -42,11 +42,13 @@ mod test {
     fn convert_date() {
         let date = Utc::now().naive_utc();
 
+        dbg!(&date);
+
         let date_string = date.to_string();
 
         dbg!(&date_string);
 
-        let parsed_date = NaiveDateTime::from_str(&date_string);
+        let parsed_date = NaiveDateTime::parse_from_str(&date_string, "%Y-%m-%d %H:%M:%S%.9f");
 
         dbg!(&parsed_date);
     }

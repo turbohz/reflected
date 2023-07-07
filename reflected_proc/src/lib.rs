@@ -267,6 +267,11 @@ fn fields_set_value(fields: &Vec<Field>) -> TokenStream2 {
                     },
                 }
             }
+        } else if field.is_date() {
+            res = quote! {
+                #res
+                #name_string => self.#field_name = chrono::NaiveDateTime::parse_from_str(&value.unwrap(), "%Y-%m-%d %H:%M:%S%.9f").unwrap(),
+            }
         } else if field.optional {
             res = quote! {
                 #res
@@ -302,8 +307,6 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
 
             let mut tp = path.path.segments.first().unwrap().ident.clone();
 
-            //            dbg!(&tp);
-
             if tp == "Option" {
                 optional = true;
                 let args = &path.path.segments.first().unwrap().arguments;
@@ -311,8 +314,6 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
                     if let GenericArgument::Type(generic_tp) = args.args.first().unwrap() {
                         let ident = generic_tp.to_token_stream().to_string();
                         let ident = Ident::new(&ident, Span::call_site());
-                        //                        dbg!(&ident);
-                        //name = ident.clone();
                         tp = ident;
                     } else {
                         unreachable!()
