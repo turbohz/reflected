@@ -7,6 +7,6 @@ members = ["tests", "reflected", "reflected_proc"]
 default-members = ["reflected"]
 
 [workspace.dependencies]
-chrono = "0.4.24"
-rand = "0.8.5"
-rust_decimal = "1.29.1"
+chrono = "0.4"
+rand = "0.8"
+rust_decimal = "1.34"
