@@ -10,7 +10,7 @@ impl<T: Reflected> ReflectedEq for T {
             let a = self.get_value(field);
             let b = other.get_value(field);
 
-            if field.is_float() {
+            if field.is_float() || field.is_decimal() {
                 let a: f64 = a.parse().unwrap();
                 let b: f64 = b.parse().unwrap();
 

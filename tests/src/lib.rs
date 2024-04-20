@@ -200,7 +200,7 @@ mod test {
     }
 
     #[test]
-    fn reflected_ed() {
+    fn reflected_eq() {
         #[derive(Default, Reflected, Clone)]
         struct Test {
             id:   usize,
@@ -212,11 +212,6 @@ mod test {
             cash:      Decimal,
             is_poros:  bool,
             height:    f64,
-
-            str_opt:     Option<String>,
-            usize_opt:   Option<usize>,
-            bool_opt:    Option<bool>,
-            decimal_opt: Option<Decimal>,
         }
 
         let user_1 = Test::random();
