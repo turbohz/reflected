@@ -13,7 +13,7 @@ use crate::field::Field;
 mod field;
 
 /// Data must also derive `Default`
-#[proc_macro_derive(Reflected, attributes(unique, name))]
+#[proc_macro_derive(Reflected)]
 pub fn reflected(stream: TokenStream) -> TokenStream {
     let mut stream = parse_macro_input!(stream as DeriveInput);
 
@@ -117,7 +117,6 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
 
         let name_string = field.name_as_string();
 
-        let unique = field.unique;
         let optional = field.optional;
 
         let tp = if optional {
@@ -136,7 +135,6 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
                 name: #name_string,
                 #tp,
                 parent_name: #type_name,
-                unique: #unique,
                 optional: #optional,
                 _p: std::marker::PhantomData,
             },
@@ -323,7 +321,7 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
                 }
             }
 
-            let attrs: Vec<String> = field
+            let _attrs: Vec<String> = field
                 .attrs
                 .iter()
                 .map(|a| {
@@ -335,14 +333,7 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
                 })
                 .collect();
 
-            let unique = attrs.contains(&"unique".to_string());
-
-            Field {
-                name,
-                tp,
-                unique,
-                optional,
-            }
+            Field { name, tp, optional }
         })
         .collect();
 

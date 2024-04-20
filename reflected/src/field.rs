@@ -1,5 +1,6 @@
 use std::{
     any::type_name,
+    fmt::{Debug, Formatter},
     hash::{Hash, Hasher},
     marker::PhantomData,
     ops::Deref,
@@ -9,12 +10,10 @@ use crate::Type;
 
 pub type FieldRef<T> = &'static Field<'static, T>;
 
-#[derive(Debug)]
 pub struct Field<'a, T> {
     pub name:        &'a str,
     pub tp:          Type,
     pub parent_name: &'a str,
-    pub unique:      bool,
     pub optional:    bool,
     pub _p:          PhantomData<T>,
 }
@@ -33,6 +32,16 @@ impl<T> Field<'_, T> {
     }
 }
 
+impl<'a, T> Debug for Field<'a, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Field {{ name: {}, tp: {:?}, parent_name: {}, optional: {} }}",
+            self.name, self.tp, self.parent_name, self.optional
+        )
+    }
+}
+
 impl<T> Deref for Field<'_, T> {
     type Target = Type;
     fn deref(&self) -> &Self::Target {
@@ -45,7 +54,6 @@ impl<'a, T> Hash for Field<'a, T> {
         self.name.hash(state);
         self.tp.hash(state);
         self.parent_name.hash(state);
-        self.unique.hash(state);
         self.optional.hash(state);
         type_name::<T>().hash(state);
     }
@@ -56,7 +64,6 @@ impl<'a, T> PartialEq for Field<'a, T> {
         self.name.eq(other.name)
             && self.tp.eq(&other.tp)
             && self.parent_name.eq(other.parent_name)
-            && self.unique.eq(&other.unique)
             && self.optional.eq(&other.optional)
     }
 }
@@ -77,12 +84,24 @@ mod test {
             name:        "",
             tp:          Type::Float,
             parent_name: "",
-            unique:      false,
             optional:    false,
             _p:          PhantomData,
         };
 
         let mut map = HashMap::<&'static Field<Strekta>, String>::default();
         map.insert(field, Default::default());
+    }
+
+    #[test]
+    fn debug() {
+        let field: &'static Field<Strekta> = &Field {
+            name:        "Name",
+            tp:          Type::Float,
+            parent_name: "SomeStruct",
+            optional:    false,
+            _p:          PhantomData,
+        };
+
+        dbg!(field);
     }
 }

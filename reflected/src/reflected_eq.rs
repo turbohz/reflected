@@ -1,0 +1,33 @@
+use crate::Reflected;
+
+pub trait ReflectedEq {
+    fn assert_eq(&self, other: &Self);
+}
+
+impl<T: Reflected> ReflectedEq for T {
+    fn assert_eq(&self, other: &Self) {
+        for field in T::fields() {
+            let a = self.get_value(field);
+            let b = other.get_value(field);
+
+            if field.is_float() {
+                let a: f64 = a.parse().unwrap();
+                let b: f64 = b.parse().unwrap();
+
+                let diff = (a - b).abs();
+
+                assert!(
+                    diff <= 0.001,
+                    "Reflected eq error: Field: {field:?}\nLeft: {a}, Right: {b}"
+                );
+
+                continue;
+            }
+
+            assert_eq!(
+                a, b,
+                "Reflected eq error: Field: {field:?}\nLeft: {a}, Right: {b}"
+            );
+        }
+    }
+}
