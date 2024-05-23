@@ -17,14 +17,12 @@ mod field;
 pub fn reflected(stream: TokenStream) -> TokenStream {
     let mut stream = parse_macro_input!(stream as DeriveInput);
 
-    let data = match &mut stream.data {
-        Data::Struct(data) => data,
-        _ => panic!("`db_entity` macro has to be used with structs"),
+    let Data::Struct(data) = &mut stream.data else {
+        panic!("`db_entity` macro has to be used with structs")
     };
 
-    let struct_fields = match &mut data.fields {
-        Fields::Named(fields) => fields,
-        _ => panic!(),
+    let Fields::Named(struct_fields) = &mut data.fields else {
+        panic!()
     };
 
     let (rename, fields) = parse_fields(struct_fields);
@@ -44,8 +42,8 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
     let fields_const_var = fields_const_var(&name, &fields);
     let fields_reflect = fields_reflect(&name, &fields);
     let simple_fields_reflect = simple_fields_reflect(&name, &fields);
-    let fields_get_value = fields_get_value(&fields);
-    let fields_set_value = fields_set_value(&fields);
+    let get_value = fields_get_value(&fields);
+    let set_value = fields_set_value(&fields);
 
     quote! {
         #[derive(Debug)]
@@ -86,7 +84,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 }
 
                 match field.name {
-                    #fields_get_value
+                    #get_value
                     _ => unreachable!("Invalid field name in get_value: {}", field.name),
                 }
             }
@@ -96,7 +94,7 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
                 use std::borrow::Borrow;
                 let field = field.borrow();
                 match field.name {
-                    #fields_set_value
+                    #set_value
                     _ => unreachable!("Invalid field name in set_value"),
                 }
             }
@@ -214,7 +212,7 @@ fn fields_get_value(fields: &Vec<Field>) -> TokenStream2 {
                     #name_string => if self.#field_name { "1" } else { "0" }.to_string(),
                 }
             }
-        } else if field.optional {
+        } else if field.optional || field.is_float() {
             res = quote! {
                 #res
                 #name_string => self.#field_name.to_reflected_string(),
@@ -298,9 +296,8 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
             let name = field.ident.as_ref().unwrap().clone();
             let mut optional = false;
 
-            let path = match &field.ty {
-                Type::Path(path) => path,
-                _ => unreachable!("invalid parse_fields"),
+            let Type::Path(path) = &field.ty else {
+                unreachable!("invalid parse_fields")
             };
 
             let mut tp = path.path.segments.first().unwrap().ident.clone();

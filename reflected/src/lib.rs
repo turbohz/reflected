@@ -10,5 +10,6 @@ pub use field::{Field, FieldRef};
 pub use field_type::{OptionalType, Type};
 pub use reflected::Reflected;
 pub use reflected_eq::ReflectedEq;
+pub use reflected_proc::Reflected;
 pub use to_reflected_string::ToReflectedString;
 pub use to_reflected_val::ToReflectedVal;

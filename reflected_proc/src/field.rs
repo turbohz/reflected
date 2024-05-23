@@ -36,6 +36,10 @@ impl Field {
         self.field_type() == "Bool"
     }
 
+    pub(crate) fn is_float(&self) -> bool {
+        self.field_type() == "Float"
+    }
+
     pub(crate) fn is_date(&self) -> bool {
         self.field_type() == "Date"
     }

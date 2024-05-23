@@ -10,4 +10,3 @@ chrono = { workspace = true }
 rust_decimal = { workspace = true }
 
 reflected = { path = "../reflected" }
-reflected_proc = { path = "../reflected_proc" }

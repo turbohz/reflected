@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use reflected_proc::Reflected;
+use reflected::Reflected;
 use rust_decimal::Decimal;
 
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -30,7 +30,6 @@ mod test {
 
     use chrono::{NaiveDateTime, Utc};
     use reflected::{Reflected, ReflectedEq};
-    use reflected_proc::Reflected;
     use rust_decimal::Decimal;
 
     use crate::{CustomField, User};
@@ -222,5 +221,28 @@ mod test {
         user_2.height += 0.0001;
 
         user_1.assert_eq(&user_2);
+    }
+
+    #[test]
+    fn get_float() {
+        #[derive(Default, Reflected)]
+        struct Data {
+            float32: f32,
+            float64: f64,
+        }
+
+        let mut data = Data {
+            float32: 5.0,
+            float64: 1.0,
+        };
+
+        assert_eq!(data.get_value(Data::FIELDS.float32), "5.0");
+        assert_eq!(data.get_value(Data::FIELDS.float64), "1.0");
+
+        data.float32 = 0.42332;
+        data.float64 = 0.438297489;
+
+        assert_eq!(data.get_value(Data::FIELDS.float32), "0.42332");
+        assert_eq!(data.get_value(Data::FIELDS.float64), "0.438297489");
     }
 }
