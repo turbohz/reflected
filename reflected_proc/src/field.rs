@@ -12,6 +12,10 @@ pub(crate) struct Field {
 }
 
 impl Field {
+    pub(crate) fn type_as_string(&self) -> TokenStream2 {
+        TokenStream2::from_str(&format!("\"{}\"", self.tp)).unwrap()
+    }
+
     pub(crate) fn name_as_string(&self) -> TokenStream2 {
         TokenStream2::from_str(&format!("\"{}\"", self.name)).unwrap()
     }

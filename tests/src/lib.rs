@@ -76,6 +76,20 @@ mod test {
     }
 
     #[test]
+    fn types() {
+        assert_eq!(User::FIELDS.id.type_name, "usize");
+        assert_eq!(User::FIELDS.custom.type_name, "CustomField");
+        assert_eq!(User::FIELDS.birthday.type_name, "NaiveDateTime");
+        assert_eq!(User::FIELDS.cash.type_name, "Decimal");
+        assert_eq!(User::FIELDS.is_poros.type_name, "bool");
+        assert_eq!(User::FIELDS.height.type_name, "f64");
+        assert_eq!(User::FIELDS.str_opt.type_name, "String");
+        assert_eq!(User::FIELDS.usize_opt.type_name, "usize");
+        assert_eq!(User::FIELDS.bool_opt.type_name, "bool");
+        assert_eq!(User::FIELDS.decimal_opt.type_name, "Decimal");
+    }
+
+    #[test]
     fn get() {
         let birthday = Utc::now().naive_utc();
 

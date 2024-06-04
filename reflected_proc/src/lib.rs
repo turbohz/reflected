@@ -113,6 +113,7 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
 
         let field_type = field.field_type();
 
+        let field_type_name = field.type_as_string();
         let name_string = field.name_as_string();
 
         let optional = field.optional;
@@ -132,6 +133,7 @@ fn fields_const_var(type_name: &Ident, fields: &Vec<Field>) -> TokenStream2 {
             #name: &reflected::Field {
                 name: #name_string,
                 #tp,
+                type_name: #field_type_name,
                 parent_name: #type_name,
                 optional: #optional,
                 _p: std::marker::PhantomData,

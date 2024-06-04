@@ -13,6 +13,7 @@ pub type FieldRef<T> = &'static Field<'static, T>;
 pub struct Field<'a, T> {
     pub name:        &'a str,
     pub tp:          Type,
+    pub type_name:   &'a str,
     pub parent_name: &'a str,
     pub optional:    bool,
     pub _p:          PhantomData<T>,
@@ -83,6 +84,7 @@ mod test {
         let field: &'static Field<Strekta> = &Field {
             name:        "",
             tp:          Type::Float,
+            type_name:   "",
             parent_name: "",
             optional:    false,
             _p:          PhantomData,
@@ -97,6 +99,7 @@ mod test {
         let field: &'static Field<Strekta> = &Field {
             name:        "Name",
             tp:          Type::Float,
+            type_name:   "f32",
             parent_name: "SomeStruct",
             optional:    false,
             _p:          PhantomData,
