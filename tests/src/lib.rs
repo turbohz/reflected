@@ -24,6 +24,27 @@ pub struct User {
     decimal_opt: Option<Decimal>,
 }
 
+#[derive(Clone, PartialEq, Debug)]
+enum Type {
+    Bool,
+    Int,
+    Text,
+}
+
+impl Default for Type {
+    fn default() -> Self {
+        Self::Int
+    }
+}
+
+// Struct with raw name and identifiers
+#[derive(Reflected, Default, PartialEq, Debug, Clone)]
+pub struct r#FieldSchema {
+    pub id: usize,
+    pub r#type: Type,
+    pub name: String,
+}
+
 #[cfg(test)]
 mod test {
     use std::str::FromStr;
@@ -32,7 +53,7 @@ mod test {
     use reflected::{Reflected, ReflectedEq};
     use rust_decimal::Decimal;
 
-    use crate::{CustomField, User};
+    use crate::{CustomField, User, Type, FieldSchema};
 
     #[test]
     fn convert_date() {
@@ -47,6 +68,26 @@ mod test {
         let parsed_date = NaiveDateTime::parse_from_str(&date_string, "%Y-%m-%d %H:%M:%S%.9f");
 
         dbg!(&parsed_date);
+    }
+
+    #[test]
+    fn test_raw_name_and_fields() {
+        assert!(FieldSchema::FIELDS.id.is_id());
+        assert!(FieldSchema::FIELDS.name.is_text());
+        assert!(FieldSchema::FIELDS.r#type.is_custom());
+
+        assert_eq!(FieldSchema::FIELDS.id.type_name, "usize");
+        assert_eq!(FieldSchema::FIELDS.name.type_name, "String");
+        assert_eq!(FieldSchema::FIELDS.r#type.type_name, "Type");
+
+        let record_schema = FieldSchema {
+            id: 436,
+            r#type: Type::Bool,
+            name: "Active".to_string(),
+        };
+
+        assert_eq!(record_schema.get_value(FieldSchema::FIELDS.id), "436".to_string());
+        assert_eq!(record_schema.get_value(FieldSchema::FIELDS.name), "Active".to_string());
     }
 
     #[test]
