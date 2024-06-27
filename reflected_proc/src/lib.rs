@@ -3,7 +3,7 @@ use std::str::FromStr;
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
 use syn::{
-    parse_macro_input, Attribute, Data, DeriveInput, Fields, FieldsNamed, GenericArgument, Ident, Meta,
+    parse_str,parse_macro_input, Attribute, Data, DeriveInput, Fields, FieldsNamed, GenericArgument, Ident, Meta,
     NestedMeta, PathArguments, Type,
     __private::{Span, TokenStream2},
 };
@@ -36,7 +36,9 @@ pub fn reflected(stream: TokenStream) -> TokenStream {
     }
     .unwrap();
 
-    let fields_struct_name = Ident::new(&format!("{name}Fields"), Span::call_site());
+    let Ok(fields_struct_name) = parse_str::<Ident>(&format!("{name}Fields")) else {
+        panic!("Could not generate a valid 'fields_struct_name' identifier.");
+    };
 
     let fields_struct = fields_struct(&name, &fields);
     let fields_const_var = fields_const_var(&name, &fields);
