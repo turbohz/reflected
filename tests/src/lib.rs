@@ -18,14 +18,14 @@ pub struct User {
     is_poros:  bool,
     height:    f64,
 
-    str_opt:     Option<String>,
+    str_opt:     Option<std::string::String>,
     usize_opt:   Option<usize>,
     bool_opt:    Option<bool>,
     decimal_opt: Option<Decimal>,
 }
 
 #[derive(Clone, PartialEq, Debug)]
-enum Type {
+pub enum Type {
     Bool,
     Int,
     Text,
@@ -38,11 +38,12 @@ impl Default for Type {
 }
 
 // Struct with raw name and identifiers
-#[derive(Reflected, Default, PartialEq, Debug, Clone)]
+#[derive(Reflected, Clone, Default, PartialEq, Debug)]
 pub struct r#FieldSchema {
     pub id: usize,
+    pub name: std::string::String,
     pub r#type: Type,
-    pub name: String,
+    pub description: std::option::Option<std::string::String>,
 }
 
 #[cfg(test)]
@@ -75,19 +76,24 @@ mod test {
         assert!(FieldSchema::FIELDS.id.is_id());
         assert!(FieldSchema::FIELDS.name.is_text());
         assert!(FieldSchema::FIELDS.r#type.is_custom());
+        assert!(FieldSchema::FIELDS.description.is_optional());
+        assert!(FieldSchema::FIELDS.description.is_text());
 
         assert_eq!(FieldSchema::FIELDS.id.type_name, "usize");
         assert_eq!(FieldSchema::FIELDS.name.type_name, "String");
         assert_eq!(FieldSchema::FIELDS.r#type.type_name, "Type");
+        assert_eq!(FieldSchema::FIELDS.description.type_name, "String");
 
         let record_schema = FieldSchema {
             id: 436,
             r#type: Type::Bool,
             name: "Active".to_string(),
+            description: None,
         };
 
         assert_eq!(record_schema.get_value(FieldSchema::FIELDS.id), "436".to_string());
         assert_eq!(record_schema.get_value(FieldSchema::FIELDS.name), "Active".to_string());
+        assert_eq!(record_schema.get_value(FieldSchema::FIELDS.description), "NULL".to_string());
     }
 
     #[test]
