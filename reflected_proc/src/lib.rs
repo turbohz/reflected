@@ -304,16 +304,14 @@ fn parse_fields(fields: &FieldsNamed) -> (Option<String>, Vec<Field>) {
                 unreachable!("invalid parse_fields")
             };
 
-            let mut tp = path.path.segments.first().unwrap().ident.clone();
+            let mut tp = path.path.segments.last().unwrap().ident.clone();
 
             if tp == "Option" {
                 optional = true;
-                let args = &path.path.segments.first().unwrap().arguments;
+                let args = &path.path.segments.last().unwrap().arguments;
                 if let PathArguments::AngleBracketed(args) = args {
-                    if let GenericArgument::Type(generic_tp) = args.args.first().unwrap() {
-                        let ident = generic_tp.to_token_stream().to_string();
-                        let ident = Ident::new(&ident, Span::call_site());
-                        tp = ident;
+                    if let GenericArgument::Type(Type::Path(generic_tp)) = args.args.first().unwrap() {
+                        tp = generic_tp.path.segments.last().unwrap().ident.clone();
                     } else {
                         unreachable!()
                     }
